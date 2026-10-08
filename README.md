@@ -1,5 +1,22 @@
 <div align="center">
 
+# 🪑 Seat-o-Matic
+
+### Examination Seating Arrangement & Question Paper Distribution Manager
+
+*A constraint-aware, modular, MVC-based examination management platform. Five independently built modules, one integrated product.*
+
+![Java](https://img.shields.io/badge/Java-17-orange?logo=openjdk)
+![Tomcat](https://img.shields.io/badge/Tomcat-9-F8DC75?logo=apachetomcat&logoColor=black)
+![Servlet](https://img.shields.io/badge/Servlet-4.0-blue)
+![JSP](https://img.shields.io/badge/View-JSP%20%2B%20JSTL-lightgrey)
+![MySQL](https://img.shields.io/badge/MySQL-8-4479A1?logo=mysql&logoColor=white)
+![Pattern](https://img.shields.io/badge/Architecture-MVC-black)
+![Build](https://img.shields.io/badge/build-Maven-C71A36?logo=apachemaven&logoColor=white)
+![Status](https://img.shields.io/badge/status-in%20development-yellow)
+
+</div>
+
 > **Design principle:** *Automation should assist academic staff, not hide decisions from them.*
 
 ---
@@ -38,14 +55,14 @@
 | **Project Title** | Seat-o-Matic: Automated Examination Seating Arrangement & Paper Distribution Manager |
 | **Track**         | Website Application Track (JSP–Servlet, Tomcat 9, MySQL)                            |
 | **Institution**   | Arya College of Engineering & IT (ACEIT), Jaipur                                     |
-| **Project Guide** | `< Er. Ram Babu Buri >`                                                              |
+| **Project Guide** | `< Er. Ram Babu Buri >`                                                                     |
 | **Duration**      | 12 weeks (84 days) + 6-day finalization buffer = 90-day log                          |
 | **Repository**    | `https://github.com/always-yash/Seat-o-Matic`                                      |
 
 ### Team Members
 
-| # | Name                   | Enrollment      | Email                       | Mobile     |
-| - | ---------------------- | --------------- | --------------------------- | ---------- |
+| # | Name                 | Enrollment      | Email                       | Mobile     |
+| - | -------------------- | --------------- | --------------------------- | ---------- |
 | 1 | `Yash Choudhary`     | 24E1ARCSM30P187 | rundla.yash@gmail.com       | 8502006448 |
 | 2 | `Ved Prakash Sharma` | 24E1ARCSM40P180 | vedsharma6377@gmail.com     | 7877145457 |
 | 3 | `Shivesh Surolia`    | 24E1ARCSM40P152 | shiveshsurolia@gmail.com    | 6367340522 |
@@ -1438,4 +1455,171 @@ gantt
     axisFormat %d %b
     title 12-Week Plan + Finalization Buffer
     section Research
+    Domain and technical research, SRS, contracts :2026-10-07, 14d
+    section Build
+    Foundation and project skeleton               :2026-10-21, 7d
+    Core data model and first working versions    :2026-10-28, 14d
+    Edge cases and UI / API integration           :2026-11-11, 14d
+    Validation, security, cross-module integration:2026-11-25, 7d
+    Testing and defect correction                 :2026-12-02, 7d
+    Optimization, usability, reliability          :2026-12-09, 7d
+    Deployment, documentation, demo preparation   :2026-12-16, 7d
+    Final regression and presentation readiness   :2026-12-23, 7d
+    section Buffer
+    Finalization buffer                           :2026-12-30, 6d
 ```
+
+### 17.2 Module-wise Weekly Plan
+
+| Wk | Phase                  | M1 Core (Yash)                                                                   | M2 Student (Shivesh)                                     | M3 Exam & Room (Shivraj)                            | M4 Paper (Sanjay)                                   | M5 Reports (Ved)                                         |
+| :-: | ---------------------- | -------------------------------------------------------------------------------- | -------------------------------------------------------- | --------------------------------------------------- | --------------------------------------------------- | -------------------------------------------------------- |
+| 1 | Research               | Manual seating workflow, constraint model, override requirements                 | Student/branch/section/subject data, CSV workflows       | Room grids, capacity and exam scheduling models     | Paper distribution and invigilation workflow        | Report needs, audit and export formats                   |
+| 2 | Research               | Constraint algorithms, MVC layering, FR/NFR, contracts                           | JDBC/DAO modelling, safe CSV parsing, module spec        | Exam/room schema, seat-generation spec              | Paper-count and buffer rules, invigilator view spec | Report catalogue, audit schema, export library choice    |
+| 3 | Foundation             | Maven WAR skeleton, packages, DB connection, auth + role model, protected routes | Entities + field validation                              | Exam and room entities, DAO skeleton                | Paper and invigilator entities, DAO skeleton        | `AuditPublisher` impl, report scaffolding              |
+| 4 | Core model             | Plan/assignment entities, first alternating allocation, seat-map hook            | Relationships, CSV import with row-level validation      | Grid → seat generation, capacity checks            | Requirement calculation per room × subject         | Conflict-summary model, first room-wise report           |
+| 5 | First working          | Alternating algorithm v1, grouping, blocked seats, conflict detection            | Student CRUD, active/inactive, bulk import               | Exam CRUD, eligibility registration, room config UI | Distribution workflow (PENDING → VERIFIED)         | Student-wise + exam summary reports                      |
+| 6 | Edge cases             | Snake strategy, configurable constraints, regeneration, manual-move validation   | Import error reports, pagination, multi-subject handling | Blocked seats, partial rooms, multi-room exams      | Buffer rules, collection tracking                   | CSV/PDF export, analytics widgets                        |
+| 7 | UI / API               | Seat-map workspace, seat inspection, locking, end-to-end walkthrough             | Student selection in exam setup, filters                 | Exam/room selection in generation flow              | Invigilator room view, status UI                    | Dashboards on live data                                  |
+| 8 | Security & integration | Server-side validation, RBAC review, transactions, audit events                  | Server-side validation on all endpoints                  | Capacity/duplicate/overlap validation               | Transition guards, ownership checks                 | Audit UI, insert-only enforcement, report access control |
+| 9 | Testing                | Allocator/conflict/auth tests                                                    | CRUD, validation, import tests                           | Seat-generation, capacity, state tests              | Paper calculation + workflow tests                  | Report accuracy, audit tests, QA regression              |
+| 10 | Optimisation           | Large-dataset allocation, clearer messages                                       | Query tuning, empty/error states                         | Query and seat-map payload tuning                   | Invigilator UX simplification                       | Report query tuning, pagination                          |
+| 11 | Deploy & docs          | Production config, demo data, docs, viva prep                                    | Module docs, smoke test                                  | Module docs, smoke test                             | Module docs, smoke test                             | Module docs, report/export smoke test                    |
+| 12 | Final                  | Final regression, override fixes, submission checklist                           | Final regression + fixes                                 | Final regression + fixes                            | Final regression + fixes                            | Final regression + fixes                                 |
+
+### 17.3 Progress Tracker
+
+| Module                  |   Status   | Last updated |
+| ----------------------- | :--------: | ------------ |
+| M1 Core                 | 🟡 Planned | `<date>`   |
+| M2 Student & Academic   | 🟡 Planned | `<date>`   |
+| M3 Exam & Room          | 🟡 Planned | `<date>`   |
+| M4 Paper & Invigilation | 🟡 Planned | `<date>`   |
+| M5 Reports & Audit      | 🟡 Planned | `<date>`   |
+
+*(🟡 Planned · 🔵 In progress · 🟢 Done. Update only with work that is actually complete.)*
+
+---
+
+## 18. Getting Started
+
+### Prerequisites
+
+- JDK 17
+- Maven 3.9+
+- Apache Tomcat **9.0.x** (Servlet 4.0, `javax.*`; do **not** use Tomcat 10+)
+- MySQL 8
+
+### Database
+
+```bash
+mysql -u root -p -e "CREATE DATABASE seatomatic CHARACTER SET utf8mb4;"
+mysql -u root -p seatomatic < database/schema.sql
+mysql -u root -p seatomatic < database/grants.sql          # least-privilege app user
+mysql -u root -p seatomatic < database/sample-data.sql     # optional demo data
+```
+
+### Create the first admin
+
+```bash
+java -cp target/classes com.seatomatic.tools.HashPassword      # prints salt + hash
+# paste them into database/seed-admin.sql, then:
+mysql -u root -p seatomatic < database/seed-admin.sql
+```
+
+### Configuration (`META-INF/context.xml`)
+
+Credentials come from JVM system properties, never from source:
+
+```xml
+<Context>
+  <Resource name="jdbc/seatomatic" auth="Container" type="javax.sql.DataSource"
+            driverClassName="com.mysql.cj.jdbc.Driver"
+            url="jdbc:mysql://localhost:3306/seatomatic?serverTimezone=UTC"
+            username="${seatomatic.db.user}" password="${seatomatic.db.pass}"
+            maxTotal="20" maxIdle="5" maxWaitMillis="10000"/>
+</Context>
+```
+
+```bash
+# $CATALINA_HOME/bin/setenv.sh
+export CATALINA_OPTS="-Dseatomatic.db.user=<user> -Dseatomatic.db.pass=<password>"
+```
+
+### Build & Deploy
+
+```bash
+mvn clean package                                    # → target/seatomatic.war
+cp target/seatomatic.war $CATALINA_HOME/webapps/
+$CATALINA_HOME/bin/startup.sh
+# open http://localhost:8080/seatomatic
+```
+
+### Demo Flow
+
+1. Admin: create branches, sections, semesters, subjects; import students (CSV).
+2. Faculty: create rooms (e.g. `C-204`, 5 × 6), mark blocked seats.
+3. Faculty: create an exam, register eligible students and subjects.
+4. Faculty: generate seating; inspect the conflict summary.
+5. Faculty: move or swap seats with preview; validate, approve, lock.
+6. Faculty/Invigilator: track paper distribution and collection.
+7. Export reports; Admin reviews the audit trail.
+
+---
+
+## 19. Deliverables & Viva Readiness
+
+### 19.1 Submission Checklist
+
+| Deliverable                                      | Location                                             | Done |
+| ------------------------------------------------ | ---------------------------------------------------- | :--: |
+| Abstract                                         | `docs/abstract.pdf`                                |  ☐  |
+| SRS                                              | `docs/SRS.pdf`                                     |  ☐  |
+| UML (use-case, class, sequence, state, activity) | `docs/figures/`                                    |  ☐  |
+| ER diagram + DB design                           | `docs/figures/fig-07-er.png`, `docs/database.md` |  ☐  |
+| UI mock-ups                                      | `docs/figures/fig-12/13`, `screenshots/`         |  ☐  |
+| Weekly tracking sheet                            | `docs/weekly-reports/`                             |  ☐  |
+| Working software (WAR + SQL)                     | this repository                                      |  ☐  |
+| Test report                                      | `docs/testing.md`                                  |  ☐  |
+| Final report                                     | `docs/report.pdf`                                  |  ☐  |
+| PPT                                              | `docs/Seat-o-Matic.pptx`                           |  ☐  |
+| Demo video                                       | `docs/demo.mp4` (or link)                          |  ☐  |
+
+### 19.2 Individual Viva Map
+
+Every member must be able to defend **their module end to end** and **the shared architecture**.
+
+| Member             | Module | Be ready to explain / demonstrate                                                                                                       |
+| ------------------ | ------ | --------------------------------------------------------------------------------------------------------------------------------------- |
+| Yash Choudhary     | M1     | MVC flow, filters, session/RBAC/password hashing, allocation algorithm, scoring, transactions, optimistic locking, integration strategy |
+| Shivesh Surolia    | M2     | Entity design, validation rules, CSV import pipeline, eligibility queries,`StudentQueryService` contract                              |
+| Shivraj Singh      | M3     | Exam lifecycle, seat-grid generation, blocked seats, room-slot conflicts,`RoomQueryService` / `ExamQueryService`                    |
+| Sanjay Jangid      | M4     | Paper-count logic (mixed subjects, buffer), status transitions, invigilator access control                                              |
+| Ved Prakash Sharma | M5     | `AuditPublisher`, insert-only audit, report SQL, export streaming, analytics, QA process                                              |
+
+---
+
+## 20. Risks, Roadmap & License
+
+### Risks
+
+| Risk                              | Mitigation                                                        |
+| --------------------------------- | ----------------------------------------------------------------- |
+| Interface drift between modules   | Frozen contracts, stubs, contract tests, weekly integration       |
+| Merge conflicts in shared files   | Kernel changes only via PR reviewed by lead                       |
+| Over-ambitious optimisation       | Deterministic heuristics first; local search only if time permits |
+| Uneven progress across members    | Weekly sheet review; pair-review across modules                   |
+| Tomcat 10 /`jakarta.*` mismatch | Pin Tomcat 9 and`javax.servlet` API in `pom.xml` and docs     |
+
+### Roadmap (beyond v1.0)
+
+- Pairwise-swap local search to lower scores
+- Student-facing portal and hall-ticket / seat-slip PDF
+- QR-based seat verification
+- Docker Compose (Tomcat + MySQL), CI via GitHub Actions
+- Timetable integration
+
+### License & Acknowledgements
+
+Distributed under the **MIT License** (`LICENSE`). Developed at ACEIT, Jaipur under the guidance of `< Er. Ram Babu Buri >`.
+
+---
