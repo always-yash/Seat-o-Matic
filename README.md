@@ -257,17 +257,6 @@ flowchart TB
     VW -->|"7 HTML response"| U
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 1 · LAYERED MVC SYSTEM ARCHITECTURE                            │
-│ file: docs/figures/fig-01-architecture.png     prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 6.3 Data Flow Diagram, Level 1 (Draft)
 
@@ -312,17 +301,6 @@ flowchart LR
     P5 -->|"room paper info"| IN
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 2 · DATA FLOW DIAGRAM (LEVEL 0 + LEVEL 1)                      │
-│ file: docs/figures/fig-02-dfd.png              prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 6.4 Deployment View (Draft)
 
@@ -347,17 +325,6 @@ flowchart LR
     POOL -->|"JDBC · TCP 3306"| MY
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 3 · DEPLOYMENT DIAGRAM                                         │
-│ file: docs/figures/fig-03-deployment.png       prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 6.5 Pure Java vs. Aiding Libraries
 
@@ -426,17 +393,6 @@ flowchart LR
     M5 -.->|"implements AuditPublisher"| K
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 4 · FIVE MODULES → ONE PRODUCT (MODULE MAP + CONTRACTS)        │
-│ file: docs/figures/fig-04-module-map.png       prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 7.3 Module Cards
 
@@ -603,17 +559,6 @@ flowchart TD
     P --> Q(["Show seat map and conflict summary"])
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 5 · SEATING ALGORITHM FLOWCHART                                │
-│ file: docs/figures/fig-05-algorithm-flow.png   prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 9.6 Core Pseudocode (Java-style)
 
@@ -674,18 +619,6 @@ flowchart TD
     L -- No --> R3["ROLLBACK and ask user to reload"]
     L -- Yes --> N["Update assignment, recompute score, write audit, COMMIT"]
     N --> M(["Seat map refreshed"])
-```
-
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 6 · MANUAL OVERRIDE ACTIVITY DIAGRAM (SWIMLANES)               │
-│ file: docs/figures/fig-06-manual-override.png  prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -896,17 +829,6 @@ erDiagram
     }
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 7 · ER DIAGRAM, GROUPED BY MODULE (M1–M5)                      │
-│ file: docs/figures/fig-07-er.png               prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 11.3 Integrity Rules
 
@@ -1016,17 +938,6 @@ flowchart LR
     IN --> U13
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 8 · USE-CASE DIAGRAM                                           │
-│ file: docs/figures/fig-08-use-case.png         prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 12.2 Class Diagram: Seating Subsystem (Draft)
 
@@ -1134,17 +1045,6 @@ classDiagram
     Room "1" *-- "*" Seat
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 9 · CLASS DIAGRAM (CONTROLLER · SERVICE · ENGINE · DAO · MODEL)│
-│ file: docs/figures/fig-09-class.png            prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 12.3 Sequence Diagram: Generate Seating through MVC (Draft)
 
@@ -1187,17 +1087,6 @@ sequenceDiagram
     V-->>F: rendered HTML
 ```
 
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 10 · SEQUENCE DIAGRAM: GENERATE SEATING                        │
-│ file: docs/figures/fig-10-sequence.png         prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
 
 ### 12.4 Examination / Plan Lifecycle (Draft)
 
@@ -1214,18 +1103,6 @@ stateDiagram-v2
     APPROVED --> LOCKED : lock
     LOCKED --> REVIEWED : authorized unlock, audited
     LOCKED --> [*]
-```
-
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 11 · STATE DIAGRAM: EXAM AND PLAN LIFECYCLE                    │
-│ file: docs/figures/fig-11-state.png            prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W INFOGRAPHIC HERE ]                    │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
 ```
 
 ---
@@ -1282,36 +1159,6 @@ stateDiagram-v2
 │ [Move] [Swap] [Regenerate Room] [Validate] [Approve] [Lock 🔒]       │
 └──────────────────────────────────────────────────────────────────────┘
 ```
-
-### 13.4 Mock-up Slots
-
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 12 · UI MOCK-UP SHEET (DESKTOP)  8 key screens                 │
-│ file: docs/figures/fig-12-ui-desktop.png       prompt: Appendix A     │
-│                                                                      │
-│                                                                      │
-│                                                                      │
-│                   [ INSERT B/W MOCK-UPS HERE ]                       │
-│                                                                      │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
-```text
-┌──────────────────────────────────────────────────────────────────────┐
-│ FIGURE 13 · UI MOCK-UP SHEET (MOBILE ~360 px)  login, dashboard,      │
-│ invigilator room view, seat map                                       │
-│ file: docs/figures/fig-13-ui-mobile.png        prompt: Appendix A     │
-│                                                                      │
-│                   [ INSERT B/W MOCK-UPS HERE ]                       │
-│                                                                      │
-│                                                                      │
-└──────────────────────────────────────────────────────────────────────┘
-```
-
----
 
 ## 14. Controller URL Map
 
@@ -1620,6 +1467,8 @@ Every member must be able to defend **their module end to end** and **the shared
 
 ### License & Acknowledgements
 
-Distributed under the **MIT License** (`LICENSE`). Developed at ACEIT, Jaipur under the guidance of `< Er. Ram Babu Buri >`.
+Distributed under the **MIT License** (`LICENSE`). 
+Developed at ACEIT, Jaipur under the guidance of `< Er. Ram Babu Buri >`.
+Developers include Surolia Pandit, Khati Bhai, Shivraj Boss, Vedu Pandit and Choudhary Saab.
 
 ---
