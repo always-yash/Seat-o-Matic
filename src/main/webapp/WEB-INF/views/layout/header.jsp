@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/app.css">
 </head>
-<body class="bg-body-tertiary text-dark" style="font-family: 'Segoe UI', sans-serif;">
+<body class="bg-body-tertiary text-dark">
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm sticky-top">
     <div class="container-fluid px-4">
         <a class="navbar-brand fw-bold" href="${pageContext.request.contextPath}/dashboard">Seat-o-Matic</a>

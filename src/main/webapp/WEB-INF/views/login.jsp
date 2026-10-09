@@ -1,31 +1,40 @@
-<%@ include file="/WEB-INF/views/layout/header.jsp" %>
-<div class="container py-5">
-    <div class="row justify-content-center align-items-center min-vh-75">
-        <div class="col-lg-5 col-md-7">
-            <div class="card border-0 shadow-lg rounded-4 overflow-hidden">
-                <div class="card-body p-4 p-lg-5">
-                    <div class="text-center mb-4">
-                        <div class="display-6 fw-bold text-primary">Seat-o-Matic</div>
-                        <p class="text-muted mb-0">Secure exam orchestration cockpit</p>
-                    </div>
-                    <c:if test="${not empty errorMessage}">
-                        <div class="alert alert-danger rounded-3">${errorMessage}</div>
-                    </c:if>
-                    <form method="post" action="${pageContext.request.contextPath}/login">
-                        <input type="hidden" name="_csrf" value="${csrfToken}">
-                        <div class="mb-3">
-                            <label class="form-label">Username</label>
-                            <input type="text" class="form-control form-control-lg rounded-3" name="username" required>
-                        </div>
-                        <div class="mb-4">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control form-control-lg rounded-3" name="password" required>
-                        </div>
-                        <button type="submit" class="btn btn-primary btn-lg w-100 rounded-3">Login</button>
-                    </form>
-                </div>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sign in | Seat-o-Matic</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
+</head>
+<body class="auth-page">
+<main class="card auth-card">
+    <div class="eyebrow">Examination operations</div>
+    <div class="auth-brand">Seat-o-Matic</div>
+    <p class="muted">Sign in to coordinate students, rooms, seating, and paper flow.</p>
+    <c:if test="${not empty errorMessage}">
+        <div class="alert alert-danger" role="alert"><c:out value="${errorMessage}" /></div>
+    </c:if>
+    <form method="post" action="${pageContext.request.contextPath}/login" novalidate>
+        <input type="hidden" name="_csrf" value="${csrfToken}">
+        <div class="form-group">
+            <label class="form-label" for="username">Username</label>
+            <input class="form-control" id="username" name="username" type="text" autocomplete="username" required autofocus>
+        </div>
+        <div class="form-group">
+            <label class="form-label" for="password">Password</label>
+            <div class="password-wrap">
+                <input class="form-control" id="password" name="password" type="password" autocomplete="current-password" required>
+                <button class="toggle-password" type="button" data-toggle-password="password">Show</button>
             </div>
         </div>
-    </div>
-</div>
-<%@ include file="/WEB-INF/views/layout/footer.jsp" %>
+        <button class="button button-primary button-block" type="submit">Continue to console</button>
+    </form>
+</main>
+<script src="${pageContext.request.contextPath}/assets/js/main.js"></script>
+</body>
+</html>

@@ -9,20 +9,20 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
-@WebServlet(name = "DashboardServlet", urlPatterns = {"/dashboard"})
+@WebServlet(name = "DashboardServlet", urlPatterns = "/dashboard")
 public class DashboardServlet extends BaseController {
-
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-        Object currentUser = currentUser(req);
-        if (currentUser == null) {
-            resp.sendRedirect(req.getContextPath() + "/login");
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+        Object username = currentUser(request);
+        if (username == null) {
+            redirect(request, response, "/login");
             return;
         }
-
-        Object role = req.getSession(false).getAttribute("role");
-        req.setAttribute("userRole", role != null ? Role.valueOf(role.toString().toUpperCase()) : Role.ADMIN);
-        req.setAttribute("username", currentUser);
-        render(req, resp, "dashboard.jsp");
+        Object roleValue = request.getSession(false).getAttribute("userRole");
+        Role role = Role.valueOf(roleValue.toString());
+        request.setAttribute("username", username);
+        request.setAttribute("userRole", role);
+        render(request, response, "dashboard.jsp");
     }
 }
