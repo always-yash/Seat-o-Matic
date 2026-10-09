@@ -1,0 +1,25 @@
+body {
+    background: linear-gradient(135deg, #f3f7ff 0%, #eef7f4 100%);
+}
+
+.navbar {
+    background: linear-gradient(135deg, #111827, #1f2937) !important;
+}
+
+.card {
+    border-radius: 1.25rem;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    border: none;
+}
+
+.min-vh-75 {
+    min-height: 75vh;
+}
+
+.nav-link:hover {
+    background: #eef2ff;
+    border-radius: 0.5rem;
+}
