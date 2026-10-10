@@ -60,6 +60,9 @@ public class LoginServlet extends BaseController {
         } catch (SQLException ex) {
             LOGGER.error("Authentication lookup failed for username {}", username, ex);
             showLoginError(request, response, "Sign-in is temporarily unavailable. Please try again.");
+        } catch (RuntimeException ex) {
+            LOGGER.error("Unexpected authentication failure for username {}", username, ex);
+            showLoginError(request, response, "Sign-in is temporarily unavailable. Please try again.");
         }
     }
 

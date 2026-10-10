@@ -7,6 +7,7 @@ public class User {
     private String username;
     private String fullName;
     private String passwordHash;
+    private String salt;
     private Role role;
     private boolean active;
 
@@ -14,10 +15,16 @@ public class User {
     }
 
     public User(Long id, String username, String fullName, String passwordHash, Role role, boolean active) {
+        this(id, username, fullName, passwordHash, null, role, active);
+    }
+
+    public User(Long id, String username, String fullName, String passwordHash, String salt,
+                Role role, boolean active) {
         this.id = id;
         this.username = username;
         this.fullName = fullName;
         this.passwordHash = passwordHash;
+        this.salt = salt;
         this.role = role;
         this.active = active;
     }
@@ -52,6 +59,14 @@ public class User {
 
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
+    }
+
+    public String getSalt() {
+        return salt;
+    }
+
+    public void setSalt(String salt) {
+        this.salt = salt;
     }
 
     public Role getRole() {

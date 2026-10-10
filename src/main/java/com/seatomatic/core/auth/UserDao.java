@@ -11,23 +11,36 @@ public class UserDao extends BaseDAO {
         if (username == null || username.isBlank()) {
             return null;
         }
-        String sql = "SELECT id, username, password_hash, role, active FROM users WHERE username = ? LIMIT 1";
+        String sql = "SELECT id, username, password_hash, salt, role, active "
+                + "FROM users WHERE username = ? LIMIT 1";
         return queryOne(sql, statement -> statement.setString(1, username.trim()), this::mapUser);
     }
 
     private User mapUser(ResultSet resultSet) throws SQLException {
         Role role;
         try {
-            role = Role.valueOf(resultSet.getString("role"));
+            String roleValue = resultSet.getString("role");
+            if (roleValue == null || roleValue.isBlank()) {
+                logger.warn("Ignoring user with missing role: {}", resultSet.getString("username"));
+                return null;
+            }
+            role = Role.valueOf(roleValue.trim().toUpperCase(java.util.Locale.ROOT));
         } catch (IllegalArgumentException ex) {
             logger.warn("Ignoring user with invalid role: {}", resultSet.getString("username"));
             return null;
         }
+        String username = resultSet.getString("username");
+        String passwordHash = resultSet.getString("password_hash");
+        if (username == null || username.isBlank() || passwordHash == null || passwordHash.isBlank()) {
+            logger.warn("Ignoring user with incomplete credentials: {}", username);
+            return null;
+        }
         return new User(
                 resultSet.getLong("id"),
-                resultSet.getString("username"),
-                resultSet.getString("username"),
-                resultSet.getString("password_hash"),
+                username,
+                username,
+                passwordHash,
+                resultSet.getString("salt"),
                 role,
                 resultSet.getBoolean("active")
         );
