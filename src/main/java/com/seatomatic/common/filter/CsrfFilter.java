@@ -3,7 +3,6 @@ package com.seatomatic.common.filter;
 import com.seatomatic.common.security.CsrfTokenManager;
 
 import javax.servlet.*;
-import javax.servlet.annotation.WebFilter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -19,7 +18,7 @@ public class CsrfFilter implements Filter {
 
         if ("POST".equalsIgnoreCase(httpRequest.getMethod())) {
             HttpSession session = httpRequest.getSession(false);
-            if (session != null && !httpRequest.getRequestURI().contains("/login")) {
+            if (session != null && !isLoginPath(httpRequest)) {
                 String submittedToken = httpRequest.getParameter("_csrf");
                 if (submittedToken == null || !CsrfTokenManager.isValid(session, submittedToken)) {
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
@@ -29,5 +28,14 @@ public class CsrfFilter implements Filter {
         }
 
         chain.doFilter(request, response);
+    }
+
+    private boolean isLoginPath(HttpServletRequest request) {
+        String contextPath = request.getContextPath();
+        String requestUri = request.getRequestURI();
+        String path = contextPath == null || contextPath.isEmpty()
+                ? requestUri
+                : requestUri.substring(contextPath.length());
+        return "/login".equals(path);
     }
 }

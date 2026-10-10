@@ -44,7 +44,7 @@ public class AuthorizationFilter implements Filter {
         chain.doFilter(request, response);
     }
 
-    static Role parseRole(Object roleValue) {
+    public static Role parseRole(Object roleValue) {
         if (!(roleValue instanceof String roleString) || roleString.isBlank()) {
             return null;
         }

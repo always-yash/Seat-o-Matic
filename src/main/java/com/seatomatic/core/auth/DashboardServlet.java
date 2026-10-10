@@ -1,6 +1,7 @@
 package com.seatomatic.core.auth;
 
 import com.seatomatic.common.security.Role;
+import com.seatomatic.common.filter.AuthorizationFilter;
 import com.seatomatic.common.web.BaseController;
 
 import javax.servlet.ServletException;
@@ -20,7 +21,12 @@ public class DashboardServlet extends BaseController {
             return;
         }
         Object roleValue = request.getSession(false).getAttribute("userRole");
-        Role role = Role.valueOf(roleValue.toString());
+        Role role = AuthorizationFilter.parseRole(roleValue);
+        if (role == null) {
+            request.getSession(false).invalidate();
+            redirect(request, response, "/login");
+            return;
+        }
         request.setAttribute("username", username);
         request.setAttribute("userRole", role);
         render(request, response, "dashboard.jsp");
