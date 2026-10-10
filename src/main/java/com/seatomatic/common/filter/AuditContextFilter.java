@@ -6,7 +6,6 @@ import javax.servlet.http.HttpServletRequest;
 import java.io.IOException;
 import java.util.UUID;
 
-@WebFilter(filterName = "auditContextFilter", urlPatterns = "/*")
 public class AuditContextFilter implements Filter {
 
     @Override

@@ -11,7 +11,6 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
 
-@WebFilter(filterName = "authFilter", urlPatterns = "/*")
 public class AuthFilter implements Filter {
     private static final String LOGIN_PATH = "/login";
 

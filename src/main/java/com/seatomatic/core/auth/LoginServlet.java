@@ -51,6 +51,7 @@ public class LoginServlet extends BaseController {
             session.setAttribute("userId", user.getId());
             session.setAttribute("username", user.getUsername());
             session.setAttribute("userRole", user.getRole().name());
+            session.setAttribute("role", user.getRole().name());
             session.setAttribute("currentUser", user.getUsername());
             session.setAttribute("fullName", user.getFullName());
             CsrfTokenManager.generateToken(session);

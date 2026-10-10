@@ -25,7 +25,7 @@
             </ul>
             <div class="d-flex align-items-center gap-3 text-white-50">
                 <span><c:out value="${sessionScope.fullName != null ? sessionScope.fullName : 'Guest'}" /></span>
-                <span class="badge rounded-pill bg-light text-dark"><c:out value="${sessionScope.role != null ? sessionScope.role : 'VISITOR'}" /></span>
+                <span class="badge rounded-pill bg-light text-dark"><c:out value="${sessionScope.userRole != null ? sessionScope.userRole : 'VISITOR'}" /></span>
                 <form method="post" action="${pageContext.request.contextPath}/logout">
                     <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">
                     <button class="btn btn-outline-light btn-sm" type="submit">Logout</button>
