@@ -1392,6 +1392,14 @@ Credentials come from JVM system properties, never from source:
 export CATALINA_OPTS="-Dseatomatic.db.user=<user> -Dseatomatic.db.pass=<password>"
 ```
 
+On Windows, place the equivalent settings in
+`%CATALINA_HOME%\bin\setenv.bat`:
+
+```bat
+@echo off
+set "CATALINA_OPTS=%CATALINA_OPTS% -Dseatomatic.db.user=<user> -Dseatomatic.db.pass=<password>"
+```
+
 For local migration testing only, a legacy plaintext `password_hash` can be
 accepted by enabling the explicit opt-in below. Do not set this property in
 shared or production environments:

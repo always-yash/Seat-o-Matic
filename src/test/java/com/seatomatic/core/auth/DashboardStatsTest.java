@@ -9,9 +9,9 @@ class DashboardStatsTest {
     void exposesAllDashboardCounters() {
         DashboardStats stats = new DashboardStats(12, 3, 4, 19);
 
-        assertEquals(12, stats.activeStudents());
-        assertEquals(3, stats.upcomingExams());
-        assertEquals(4, stats.configuredRooms());
-        assertEquals(19, stats.auditEvents());
+        assertEquals(12, stats.getActiveStudents());
+        assertEquals(3, stats.getUpcomingExams());
+        assertEquals(4, stats.getConfiguredRooms());
+        assertEquals(19, stats.getAuditEvents());
     }
 }
