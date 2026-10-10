@@ -1,13 +1,13 @@
-<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<div class="legacy-sidebar bg-white border-end p-3 shadow-sm">
-    <div class="fw-bold text-uppercase text-secondary small mb-3">Navigation</div>
-    <nav class="nav flex-column gap-2">
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/dashboard">Overview</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/students">Students</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/exams">Exams</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/rooms">Rooms</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/seating/plan">Seating</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/papers">Paper Flow</a>
-        <a class="nav-link rounded px-3 py-2 text-dark" href="${pageContext.request.contextPath}/reports">Reports</a>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<div class="legacy-sidebar">
+    <div class="eyebrow">Navigation</div>
+    <nav class="topnav" aria-label="Workspace navigation">
+        <a href="${pageContext.request.contextPath}/dashboard">Overview</a>
+        <a href="${pageContext.request.contextPath}/students">Students</a>
+        <a href="${pageContext.request.contextPath}/exams">Exams</a>
+        <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
+        <a href="${pageContext.request.contextPath}/seating/plan">Seating</a>
+        <a href="${pageContext.request.contextPath}/papers">Paper Flow</a>
+        <a href="${pageContext.request.contextPath}/reports">Reports</a>
     </nav>
 </div>
