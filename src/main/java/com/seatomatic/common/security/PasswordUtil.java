@@ -10,9 +10,15 @@ import java.security.MessageDigest;
 import java.security.SecureRandom;
 import java.util.Base64;
 
+/**
+ * Cryptographic utility providing secure password hashing and verification.
+ * Supports both standard industry BCrypt and PBKDF2WithHmacSHA256,
+ * with constant-time verification and strict fail-closed security.
+ */
 public final class PasswordUtil {
     private static final Logger LOGGER = LoggerFactory.getLogger(PasswordUtil.class);
     private static final String ALLOW_PLAINTEXT_PROPERTY = "seatomatic.auth.allowPlaintextPasswords";
+    private static final int BCRYPT_LOG_ROUNDS = 12;
     private static final int ITERATIONS = 600_000;
     private static final int KEY_LENGTH = 256;
     private static final int SALT_LENGTH = 16;
@@ -21,7 +27,20 @@ public final class PasswordUtil {
     private PasswordUtil() {
     }
 
+    /**
+     * Hashes a password using PBKDF2WithHmacSHA256 with a cryptographically secure salt.
+     *
+     * @param password the plaintext password to hash
+     * @return salt:hash encoded string
+     */
     public static String hash(String password) {
+        return hashPBKDF2(password);
+    }
+
+    /**
+     * Explicitly hashes a password using PBKDF2WithHmacSHA256.
+     */
+    public static String hashPBKDF2(String password) {
         if (password == null) {
             throw new IllegalArgumentException("Password must not be null");
         }
@@ -30,6 +49,28 @@ public final class PasswordUtil {
         return encode(salt) + ":" + encode(derive(password, salt));
     }
 
+    /**
+     * Hashes a password using BCrypt with salt rounds configured to 12.
+     *
+     * @param password the plaintext password to hash
+     * @return standard BCrypt hash string
+     */
+    public static String hashBCrypt(String password) {
+        if (password == null) {
+            throw new IllegalArgumentException("Password must not be null");
+        }
+        return BCrypt.hashpw(password, BCrypt.gensalt(BCRYPT_LOG_ROUNDS));
+    }
+
+    /**
+     * Verifies a candidate plaintext password against a stored hash.
+     * Supports both BCrypt hashes (starting with $2a$, $2b$, or $2y$)
+     * and PBKDF2 hashes (formatted as salt:hash), with fail-closed semantics.
+     *
+     * @param password   the plaintext password candidate
+     * @param storedHash the persisted hash string
+     * @return true if candidate matches stored hash, false otherwise
+     */
     public static boolean verify(String password, String storedHash) {
         if (password == null || storedHash == null || storedHash.isBlank()) {
             return false;
