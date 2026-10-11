@@ -1,4 +1,5 @@
-﻿<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -23,7 +24,7 @@
         <a href="${pageContext.request.contextPath}/reports">Reports</a>
     </nav>
     <div class="topbar-actions">
-        <span class="role-badge"><c:out value="${sessionScope.userRole}" /></span>
+        <span class="role-badge"><c:out value="${sessionScope.userRole != null ? sessionScope.userRole : 'USER'}" /></span>
         <span class="user-name"><c:out value="${sessionScope.username}" /></span>
         <form method="post" action="${pageContext.request.contextPath}/logout">
             <input type="hidden" name="_csrf" value="${sessionScope.csrfToken}">

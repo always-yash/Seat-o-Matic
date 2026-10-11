@@ -3,12 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Server Error</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Server Error | Seat-o-Matic</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
 </head>
-<body class="bg-light">
-<div class="container py-5">
-    <div class="alert alert-danger"><strong>500</strong> Something went wrong on the server.</div>
+<body class="error-page">
+<div class="card error-card">
+    <div class="eyebrow">System interruption</div>
+    <div class="error-code">500</div>
+    <h1>Something went wrong.</h1>
+    <p>The workspace hit an unexpected issue. Return to sign in and try again.</p>
+    <a class="button button-primary" href="${pageContext.request.contextPath}/login">Back to sign in</a>
 </div>
 </body>
 </html>

@@ -3,12 +3,16 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Forbidden</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Access denied | Seat-o-Matic</title>
+    <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
 </head>
-<body class="bg-light">
-<div class="container py-5">
-    <div class="alert alert-danger"><strong>403</strong> Access denied.</div>
+<body class="error-page">
+<div class="card error-card">
+    <div class="eyebrow">Workspace permissions</div>
+    <div class="error-code">403</div>
+    <h1>Access denied.</h1>
+    <p>This workspace is not available for the current request.</p>
+    <a class="button button-primary" href="${pageContext.request.contextPath}/login">Back to sign in</a>
 </div>
 </body>
 </html>
