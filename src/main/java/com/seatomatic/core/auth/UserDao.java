@@ -17,16 +17,10 @@ public class UserDao extends BaseDAO {
     }
 
     private User mapUser(ResultSet resultSet) throws SQLException {
-        Role role;
-        try {
-            String roleValue = resultSet.getString("role");
-            if (roleValue == null || roleValue.isBlank()) {
-                logger.warn("Ignoring user with missing role: {}", resultSet.getString("username"));
-                return null;
-            }
-            role = Role.valueOf(roleValue.trim().toUpperCase(java.util.Locale.ROOT));
-        } catch (IllegalArgumentException ex) {
-            logger.warn("Ignoring user with invalid role: {}", resultSet.getString("username"));
+        String roleValue = resultSet.getString("role");
+        Role role = Role.fromString(roleValue);
+        if (role == null) {
+            logger.warn("Ignoring user with invalid or missing role: {}", resultSet.getString("username"));
             return null;
         }
         String username = resultSet.getString("username");
