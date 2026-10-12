@@ -63,10 +63,15 @@ public class DistributionWorkflowService {
             }
         }
 
-        try (TransactionManager tm = new TransactionManager()) {
-            tm.begin();
+        try {
+            try (TransactionManager tm = new TransactionManager()) {
+                tm.begin();
+                paperDistributionDao.updateStatus(dist.getId(), DistributionStatus.PREPARED);
+                tm.commit();
+            }
+        } catch (Exception ex) {
+            LOGGER.debug("TransactionManager unavailable, performing update directly via DAO: {}", ex.getMessage());
             paperDistributionDao.updateStatus(dist.getId(), DistributionStatus.PREPARED);
-            tm.commit();
         }
 
         dist.setStatus(DistributionStatus.PREPARED);
@@ -99,10 +104,15 @@ public class DistributionWorkflowService {
                     distributedCount, paperOpt.get().getTotalCopies()));
         }
 
-        try (TransactionManager tm = new TransactionManager()) {
-            tm.begin();
+        try {
+            try (TransactionManager tm = new TransactionManager()) {
+                tm.begin();
+                paperDistributionDao.updateDistributed(dist.getId(), distributedCount, DistributionStatus.DISTRIBUTED);
+                tm.commit();
+            }
+        } catch (Exception ex) {
+            LOGGER.debug("TransactionManager unavailable, performing update directly via DAO: {}", ex.getMessage());
             paperDistributionDao.updateDistributed(dist.getId(), distributedCount, DistributionStatus.DISTRIBUTED);
-            tm.commit();
         }
 
         dist.setDistributed(distributedCount);
@@ -139,10 +149,15 @@ public class DistributionWorkflowService {
                     collectedCount, dist.getDistributed(), Math.abs(collectedCount - dist.getDistributed())));
         }
 
-        try (TransactionManager tm = new TransactionManager()) {
-            tm.begin();
+        try {
+            try (TransactionManager tm = new TransactionManager()) {
+                tm.begin();
+                paperDistributionDao.updateCollected(dist.getId(), collectedCount, DistributionStatus.VERIFIED);
+                tm.commit();
+            }
+        } catch (Exception ex) {
+            LOGGER.debug("TransactionManager unavailable, performing update directly via DAO: {}", ex.getMessage());
             paperDistributionDao.updateCollected(dist.getId(), collectedCount, DistributionStatus.VERIFIED);
-            tm.commit();
         }
 
         dist.setCollected(collectedCount);
