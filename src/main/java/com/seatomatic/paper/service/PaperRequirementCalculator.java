@@ -232,31 +232,4 @@ public class PaperRequirementCalculator extends BaseDAO {
             }
         }
     }
-
-    /**
-     * Synchronizes existing paper distribution records with the latest active seating plan,
-     * pruning obsolete PENDING room packets if rooms have been de-allocated or removed.
-     */
-    public int syncDistributionWithActivePlan(Long examId, Long actorUserId) throws Exception {
-        if (examId == null) {
-            return 0;
-        }
-        Long planId = findActivePlanId(examId);
-        if (planId == null) {
-            return 0;
-        }
-        List<RoomPaperRequirementDTO> current = calculateRequirements(examId, null);
-        List<Long> activeRoomIds = current.stream()
-                .map(RoomPaperRequirementDTO::getRoomId)
-                .distinct()
-                .toList();
-
-        int pruned = paperDistributionDao.deleteOrphanedPendingRecords(planId, activeRoomIds);
-        if (pruned > 0 && auditPublisher != null && actorUserId != null) {
-            auditPublisher.publish("SYNC_DISTRIBUTION_PLAN", String.valueOf(actorUserId),
-                    "EXAM", examId,
-                    String.format("{\"planId\":%d,\"prunedOrphans\":%d}", planId, pruned));
-        }
-        return pruned;
-    }
 }

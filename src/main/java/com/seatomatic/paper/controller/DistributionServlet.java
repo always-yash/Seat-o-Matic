@@ -55,12 +55,6 @@ public class DistributionServlet extends BaseController {
             }
         }
 
-        String action = parameter(request, "action");
-        if ("export".equalsIgnoreCase(action)) {
-            exportCsv(request, response, examId, buffer);
-            return;
-        }
-
         try {
             var exams = lookupDao.findAllExams();
             if (examId == null && !exams.isEmpty()) {
@@ -197,45 +191,5 @@ public class DistributionServlet extends BaseController {
         request.getSession(true).setAttribute("flashSuccess",
                 "Reconciliation verified successfully: " + collectedCount + " scripts confirmed.");
         redirect(request, response, "/distribution?examId=" + (examId != null ? examId : ""));
-    }
-
-    private void exportCsv(HttpServletRequest request, HttpServletResponse response, Long examId, Integer buffer)
-            throws IOException {
-        if (examId == null) {
-            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Examination ID is required for manifest export.");
-            return;
-        }
-        try {
-            List<RoomPaperRequirementDTO> requirements = calculator.calculateRequirements(examId, buffer);
-            response.setContentType("text/csv; charset=UTF-8");
-            response.setHeader("Content-Disposition", "attachment; filename=\"distribution-manifest-exam-" + examId + ".csv\"");
-
-            var writer = response.getWriter();
-            writer.println("RoomCode,SubjectCode,SubjectName,PaperSet,StudentCount,BufferCount,TotalRequired,Distributed,Collected,Status");
-            for (RoomPaperRequirementDTO req : requirements) {
-                writer.printf("\"%s\",\"%s\",\"%s\",\"%s\",%d,%d,%d,%d,%d,\"%s\"%n",
-                        escapeCsv(req.getRoomCode()),
-                        escapeCsv(req.getSubjectCode()),
-                        escapeCsv(req.getSubjectName()),
-                        escapeCsv(req.getPaperSetCode()),
-                        req.getStudentCount(),
-                        req.getBufferCount(),
-                        req.getTotalRequired(),
-                        req.getDistributedCount(),
-                        req.getCollectedCount(),
-                        req.getDistributionStatus() != null ? req.getDistributionStatus().name() : "PENDING");
-            }
-            writer.flush();
-        } catch (SQLException ex) {
-            LOGGER.error("Failed to export distribution manifest CSV", ex);
-            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR, "Export error: " + ex.getMessage());
-        }
-    }
-
-    private String escapeCsv(String val) {
-        if (val == null) {
-            return "";
-        }
-        return val.replace("\"", "\"\"");
     }
 }

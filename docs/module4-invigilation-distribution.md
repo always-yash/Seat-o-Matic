@@ -237,37 +237,5 @@ In the event of damaged papers, misprints, or script count discrepancies, invigi
 | 19 | `d780582` | `test(paper-discrepancy): add test suite for room incident logging and discrepancy auditing` |
 | 20 | `d6943e6` | `test(perf-benchmark): add high-volume calculation performance benchmark test suite` |
 | 21 | `d51765b` | `test(e2e-workflow): add end-to-end integration test covering complete distribution lifecycle` |
-| 22 | `54d23e3` | `docs(module4): complete concurrency specifications, incident response guide, and verification audit` |
-
----
-
-## 11. Enterprise Logistics Enhancements (Follow-Up Improvements)
-
-### 11.1 Multi-Room Aggregate Stock Reservation
-The system now enforces global multi-room stock validation (`PaperService.validateAggregateStockSufficiency`). While individual room requests may be within printed stock bounds, this engine computes $\sum \text{Required}$ across all halls assigned to an exam and warns of aggregate deficit before dispatch.
-
-### 11.2 Distribution Manifest CSV Export
-Administrators and exam controllers can export the active examination room packet dispatch schedule directly via HTTP GET `/distribution?action=export&examId=<id>` as an RFC 4180-compliant CSV file with escaped fields and download headers.
-
-### 11.3 Relational Dependency Protection
-To ensure referential integrity, question paper sets cannot be deleted if active distribution records depend on them (`QuestionPaperDao.hasActiveDistributions`). The service raises a clear `ValidationException` and emits audit events upon legitimate deletion.
-
-### 11.4 Seating Plan Dynamic Re-Sync & Orphan Pruning
-When seating plans are modified or reallocated, `PaperRequirementCalculator.syncDistributionWithActivePlan` detects unallocated or de-assigned exam rooms, automatically pruning obsolete `PENDING` packet records while preserving `PREPARED`, `DISTRIBUTED`, and `VERIFIED` records.
-
----
-
-## 12. Follow-Up 8-Commit Delivery Audit (`feature/module4-followup`)
-
-| # | Hash | Description |
-|---|---|---|
-| 1 | `e676af9` | `feat(paper-stock): implement aggregate examination stock reservation and shortfall validation` |
-| 2 | `cd2a1ce` | `test(paper-stock): add aggregate multi-room stock reservation and deficit test suite` |
-| 3 | `7f0695c` | `feat(distribution-export): implement CSV manifest export endpoint in DistributionServlet` |
-| 4 | `cc7a048` | `test(distribution-export): add manifest CSV streaming and header format test suite` |
-| 5 | `732b13f` | `feat(paper-dao): add distribution dependency guard preventing invalid question paper deletion` |
-| 6 | `bdb6865` | `test(paper-dao): add dependency guard test suite for question paper lifecycle` |
-| 7 | `fe86ce3` | `feat(paper-sync): implement seating plan re-synchronization and orphan packet cleanup engine` |
-| 8 | `e5bc7d0` | `docs(module4): document stock reservation, CSV manifest export, and plan sync operations` |
-
+| 22 | `74ef991` | `docs(module4): complete concurrency specifications, incident response guide, and verification audit` |
 
