@@ -1,6 +1,8 @@
 package com.seatomatic.common.security;
 
 import javax.servlet.http.HttpSession;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 import java.util.UUID;
 
 public final class CsrfTokenManager {
@@ -21,7 +23,13 @@ public final class CsrfTokenManager {
     }
 
     public static boolean isValid(HttpSession session, String incomingToken) {
+        if (session == null || incomingToken == null) {
+            return false;
+        }
         String expected = token(session);
-        return expected != null && expected.equals(incomingToken);
+        return expected != null && MessageDigest.isEqual(
+                expected.getBytes(StandardCharsets.UTF_8),
+                incomingToken.getBytes(StandardCharsets.UTF_8)
+        );
     }
 }

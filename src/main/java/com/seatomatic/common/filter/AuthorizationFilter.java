@@ -91,7 +91,7 @@ public class AuthorizationFilter implements Filter {
      * Determines whether the specified role is authorized for the target path.
      */
     public static boolean isAuthorized(String path, Role role) {
-        if (role == null) {
+        if (path == null || path.isBlank() || role == null) {
             return false;
         }
 
@@ -158,4 +158,3 @@ public class AuthorizationFilter implements Filter {
         request.getRequestDispatcher("/WEB-INF/views/error/403.jsp").forward(request, response);
     }
 }
-
