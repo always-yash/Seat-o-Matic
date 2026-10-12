@@ -39,6 +39,7 @@ class LoginServletTest {
         dispatcher = mock(RequestDispatcher.class);
 
         when(request.getContextPath()).thenReturn("");
+        when(response.encodeRedirectURL(anyString())).thenAnswer(invocation -> invocation.getArgument(0));
         when(request.getRequestDispatcher(anyString())).thenReturn(dispatcher);
     }
 
@@ -126,4 +127,3 @@ class LoginServletTest {
         verify(dispatcher).forward(request, response);
     }
 }
-

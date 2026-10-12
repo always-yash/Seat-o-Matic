@@ -1,5 +1,6 @@
 package com.seatomatic.common.filter;
 
+import com.seatomatic.common.security.Role;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -14,6 +15,7 @@ import java.io.PrintWriter;
 import java.io.StringWriter;
 
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.mockito.Mockito.*;
 
 class AuthorizationFilterTest {
@@ -132,6 +134,12 @@ class AuthorizationFilterTest {
     }
 
     @Test
+    void testNullPathFailsClosed() {
+        assertFalse(AuthorizationFilter.isAuthorized(null, Role.ADMIN));
+        assertFalse(AuthorizationFilter.isAuthorized("   ", Role.ADMIN));
+    }
+
+    @Test
     void testForbiddenAjaxReturnsJsonResponse() throws IOException, ServletException {
         when(request.getRequestURI()).thenReturn("/admin/api");
         when(request.getHeader("Accept")).thenReturn("application/json");
@@ -148,4 +156,3 @@ class AuthorizationFilterTest {
         verify(dispatcher, never()).forward(request, response);
     }
 }
-
