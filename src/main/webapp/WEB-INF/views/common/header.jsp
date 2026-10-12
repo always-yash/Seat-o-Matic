@@ -18,13 +18,12 @@
     </a>
     <nav class="topnav" aria-label="Primary navigation">
         <a href="${pageContext.request.contextPath}/dashboard">Overview</a>
-        <c:if test="${sessionScope.userRole == 'ADMIN' || sessionScope.userRole == 'FACULTY'}">
-            <a href="${pageContext.request.contextPath}/students">Students</a>
-            <a href="${pageContext.request.contextPath}/exams">Exams</a>
-            <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
-        </c:if>
-        <a href="${pageContext.request.contextPath}/seating/plan">Seating</a>
+        <a href="${pageContext.request.contextPath}/students">Students</a>
+        <a href="${pageContext.request.contextPath}/exams">Exams</a>
+        <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
         <a href="${pageContext.request.contextPath}/papers">Papers</a>
+        <a href="${pageContext.request.contextPath}/distribution">Distribution</a>
+        <a href="${pageContext.request.contextPath}/invigilator/room">Invigilation</a>
         <a href="${pageContext.request.contextPath}/reports">Reports</a>
     </nav>
     <div class="topbar-actions">
