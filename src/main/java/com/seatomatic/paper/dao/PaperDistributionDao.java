@@ -148,6 +148,27 @@ public class PaperDistributionDao extends BaseDAO {
         return incomplete == 0;
     }
 
+    public int deleteOrphanedPendingRecords(Long planId, List<Long> activeRoomIds) throws SQLException {
+        if (planId == null) {
+            return 0;
+        }
+        if (activeRoomIds == null || activeRoomIds.isEmpty()) {
+            String sql = "DELETE FROM paper_distribution WHERE plan_id = ? AND status = 'PENDING'";
+            return executeUpdate(sql, planId);
+        }
+        StringBuilder sql = new StringBuilder("DELETE FROM paper_distribution WHERE plan_id = ? AND status = 'PENDING' AND room_id NOT IN (");
+        for (int i = 0; i < activeRoomIds.size(); i++) {
+            sql.append(i > 0 ? ",?" : "?");
+        }
+        sql.append(")");
+        Object[] params = new Object[activeRoomIds.size() + 1];
+        params[0] = planId;
+        for (int i = 0; i < activeRoomIds.size(); i++) {
+            params[i + 1] = activeRoomIds.get(i);
+        }
+        return executeUpdate(sql.toString(), params);
+    }
+
     public int getRequiredCopies(Long roomId, Long subjectId) throws SQLException {
         if (roomId == null || subjectId == null) {
             return 0;
@@ -156,6 +177,17 @@ public class PaperDistributionDao extends BaseDAO {
                      "JOIN question_papers qp ON pd.paper_id = qp.id " +
                      "WHERE pd.room_id = ? AND qp.subject_id = ?";
         Long sum = queryOne(sql, rs -> rs.getLong(1), roomId, subjectId);
+        return sum != null ? sum.intValue() : 0;
+    }
+
+    public int getAggregateRequiredForPaper(Long examId, Long paperId) throws SQLException {
+        if (examId == null || paperId == null) {
+            return 0;
+        }
+        String sql = "SELECT COALESCE(SUM(pd.required), 0) FROM paper_distribution pd " +
+                     "JOIN question_papers qp ON pd.paper_id = qp.id " +
+                     "WHERE qp.exam_id = ? AND pd.paper_id = ?";
+        Long sum = queryOne(sql, rs -> rs.getLong(1), examId, paperId);
         return sum != null ? sum.intValue() : 0;
     }
 

@@ -93,6 +93,22 @@ public class QuestionPaperDao extends BaseDAO {
         return count > 0;
     }
 
+    public boolean hasActiveDistributions(Long paperId) throws SQLException {
+        if (paperId == null) {
+            return false;
+        }
+        String sql = "SELECT COUNT(*) FROM paper_distribution WHERE paper_id = ?";
+        return queryCount(sql, paperId) > 0;
+    }
+
+    public int delete(Long id) throws SQLException {
+        if (id == null) {
+            return 0;
+        }
+        String sql = "DELETE FROM question_papers WHERE id = ?";
+        return executeUpdate(sql, id);
+    }
+
     private QuestionPaper mapRow(ResultSet rs) throws SQLException {
         QuestionPaper qp = new QuestionPaper();
         qp.setId(rs.getLong("id"));

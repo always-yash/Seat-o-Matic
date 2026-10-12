@@ -92,6 +92,24 @@ public class PaperService implements PaperQueryService {
         }
     }
 
+    /**
+     * Deletes a question paper set after verifying that no room distribution dependencies exist.
+     */
+    public boolean deletePaperSet(Long paperId, Long actorUserId) throws SQLException, ValidationException {
+        if (paperId == null || paperId <= 0) {
+            throw new ValidationException("A valid Question Paper ID is required for deletion.");
+        }
+        if (questionPaperDao.hasActiveDistributions(paperId)) {
+            throw new ValidationException("Cannot delete question paper set: Active distribution records depend on this paper set.");
+        }
+        int deleted = questionPaperDao.delete(paperId);
+        if (deleted > 0 && auditPublisher != null && actorUserId != null) {
+            auditPublisher.publish("DELETE_PAPER_SET", String.valueOf(actorUserId),
+                    "QUESTION_PAPER", paperId, "{\"deleted\":true}");
+        }
+        return deleted > 0;
+    }
+
     public List<QuestionPaper> getPapersForExam(Long examId) throws SQLException {
         if (examId == null) {
             return List.of();
@@ -152,6 +170,28 @@ public class PaperService implements PaperQueryService {
             LOGGER.error("Failed to check distribution completion for room {}", roomId, ex);
             return false;
         }
+    }
+
+    /**
+     * Validates that total printed stock for every question paper set in an exam
+     * is sufficient to cover aggregate requirements across all allocated examination rooms.
+     */
+    public List<String> validateAggregateStockSufficiency(Long examId) throws SQLException {
+        if (examId == null) {
+            return List.of();
+        }
+        List<QuestionPaper> papers = questionPaperDao.findByExamId(examId);
+        List<String> shortfalls = new java.util.ArrayList<>();
+        for (QuestionPaper qp : papers) {
+            int aggregateRequired = paperDistributionDao.getAggregateRequiredForPaper(examId, qp.getId());
+            if (qp.getTotalCopies() < aggregateRequired) {
+                int deficit = aggregateRequired - qp.getTotalCopies();
+                String msg = String.format("Stock deficit for Set '%s' (Subject %d): Required across rooms=%d, available=%d (Deficit: %d)",
+                        qp.getSetCode(), qp.getSubjectId(), aggregateRequired, qp.getTotalCopies(), deficit);
+                shortfalls.add(msg);
+            }
+        }
+        return shortfalls;
     }
 
     private void validatePaperInput(Long examId, Long subjectId, String setCode, int totalCopies)
