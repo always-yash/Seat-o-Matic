@@ -1,5 +1,5 @@
 <div align="center">
-    
+
 # 🪑 Seat-o-Matic
 
 ### Examination Seating Arrangement & Question Paper Distribution Manager
