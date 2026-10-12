@@ -78,6 +78,16 @@
         <url-pattern>/invigilator</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>StudentServlet</servlet-name>
+        <servlet-class>com.seatomatic.student.controller.StudentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentServlet</servlet-name>
+        <url-pattern>/students</url-pattern>
+        <url-pattern>/students/*</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
