@@ -189,6 +189,24 @@ CREATE TABLE invigilator_assignments (
     INDEX idx_invigilator_exam_room (exam_id, room_id)
 );
 
+CREATE TABLE paper_discrepancies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    distribution_id BIGINT NULL,
+    exam_id BIGINT NOT NULL,
+    room_id BIGINT NOT NULL,
+    incident_type VARCHAR(60) NOT NULL,
+    count_affected INT NOT NULL DEFAULT 0,
+    description TEXT,
+    reported_by BIGINT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'REPORTED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    CONSTRAINT fk_discrepancy_exam FOREIGN KEY (exam_id) REFERENCES exams(id),
+    CONSTRAINT fk_discrepancy_room FOREIGN KEY (room_id) REFERENCES rooms(id),
+    INDEX idx_discrepancy_exam (exam_id),
+    INDEX idx_discrepancy_room (room_id)
+);
+
 CREATE TABLE audit_logs (
     id BIGINT PRIMARY KEY AUTO_INCREMENT,
     actor_user_id BIGINT NULL,

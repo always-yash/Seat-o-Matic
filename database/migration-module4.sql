@@ -69,3 +69,20 @@ SET @sql_idx_qp := IF(@exist_idx_qp = 0, 'CREATE INDEX idx_qp_exam_subject ON qu
 PREPARE stmt_idx_qp FROM @sql_idx_qp;
 EXECUTE stmt_idx_qp;
 DEALLOCATE PREPARE stmt_idx_qp;
+
+-- 4. Create paper_discrepancies table for room incidents and script reconciliation issues
+CREATE TABLE IF NOT EXISTS paper_discrepancies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    distribution_id BIGINT NULL,
+    exam_id BIGINT NOT NULL,
+    room_id BIGINT NOT NULL,
+    incident_type VARCHAR(60) NOT NULL,
+    count_affected INT NOT NULL DEFAULT 0,
+    description TEXT,
+    reported_by BIGINT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'REPORTED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    INDEX idx_discrepancy_exam (exam_id),
+    INDEX idx_discrepancy_room (room_id)
+);
