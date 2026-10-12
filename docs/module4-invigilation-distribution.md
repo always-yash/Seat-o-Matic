@@ -188,3 +188,54 @@ When presenting Module 4 to project guides or evaluators, follow this script:
 4. Hit Enter:
    - System immediately blocks the request and renders `403 Forbidden` (*Access Denied: You are not authorized to access Room 2*).
    - Point out that this access denial was logged as a security audit event in `audit_logs`.
+
+---
+
+## 9. Advanced Logistics: Concurrency, Printable Slips, Attendance, & Incidents
+
+### 9.1 Optimistic Version Locking (`version INT`)
+To safeguard packet updates from simultaneous web requests or concurrent invigilator actions, `paper_distribution` incorporates a row-level `version` column. State machine methods enforce conditional updates (`WHERE id = ? AND version = ?`), immediately rejecting concurrent edits with a clear validation error.
+
+### 9.2 Printable Room Packet Slips & Manifest Labels (`PacketSlipGenerator`)
+Physical envelope labels can be generated containing:
+- Examination title and date
+- Room code and designated invigilator
+- Subject code, subject title, and paper set
+- Authorized student count, buffer copies, and packet total
+- Receiver signature and timestamp line
+
+### 9.3 Invigilator Room Check-in & Attendance (`InvigilationService.recordCheckIn`)
+Invigilators must authenticate their physical presence in their assigned hall before receiving paper packets. Attempting to check into an unassigned room triggers an immediate IDOR security violation.
+
+### 9.4 Examination Incident & Discrepancy Reporting (`DiscrepancyIncidentService`)
+In the event of damaged papers, misprints, or script count discrepancies, invigilators or hall superintendents log an official incident in `paper_discrepancies` with automatic high-priority audit trail logging.
+
+---
+
+## 10. Autonomous Commit History & Deliverables Audit
+
+| Commit # | Hash | Description |
+|---|---|---|
+| 1 | `14d377b` | `feat(paper-schema): align Module 4 schema, constraints, and migration strategy` |
+| 2 | `ed8171c` | `feat(paper-model): complete paper, distribution, and invigilator domain models and DTOs` |
+| 3 | `b9d5de5` | `feat(paper-dao): implement DAO persistence layer and database constraints for Module 4` |
+| 4 | `ca4ce4b` | `feat(paper-calc): implement room-subject paper requirement calculation and buffer handling` |
+| 5 | `3093031` | `feat(paper-service): implement paper set management and PaperQueryService integration` |
+| 6 | `ea5a041` | `feat(paper-workflow): implement guarded distribution workflow and audit logging` |
+| 7 | `f537eaf` | `feat(invigilation-service): implement room-scoped invigilator authorization and collection reconciliation` |
+| 8 | `58d7746` | `feat(paper-controller): implement paper management, distribution, and invigilator servlets` |
+| 9 | `117481a` | `feat(paper-ui-tests): implement JSP interfaces and comprehensive automated test suite (TC-P01, TC-P02, TC-P03)` |
+| 10 | `b679664` | `docs(module4): record Module 4 implementation, verification, and faculty demo walkthrough` |
+| 11 | `390513f` | `feat(workflow-concurrency): implement optimistic version locking on paper distribution records` |
+| 12 | `eec8fc9` | `test(workflow-concurrency): add multi-threaded concurrent transition test suite` |
+| 13 | `f441150` | `feat(paper-slips): implement printable packet slip and envelope manifest generator` |
+| 14 | `b575eee` | `test(paper-slips): add unit test coverage for packet envelope slip generation` |
+| 15 | `0ce68b3` | `feat(invigilation-attendance): implement invigilator room check-in and attendance verification` |
+| 16 | `0295184` | `test(invigilation-attendance): add test suite for invigilator check-in and attendance verification` |
+| 17 | `02f3e39` | `feat(paper-discrepancy): implement script discrepancy and exam room incident logging model and DAO` |
+| 18 | `6b8ad48` | `feat(paper-discrepancy): implement incident reporting service with automated security auditing` |
+| 19 | `d780582` | `test(paper-discrepancy): add test suite for room incident logging and discrepancy auditing` |
+| 20 | `d6943e6` | `test(perf-benchmark): add high-volume calculation performance benchmark test suite` |
+| 21 | `d51765b` | `test(e2e-workflow): add end-to-end integration test covering complete distribution lifecycle` |
+| 22 | `74ef991` | `docs(module4): complete concurrency specifications, incident response guide, and verification audit` |
+
