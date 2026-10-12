@@ -159,6 +159,17 @@ public class PaperDistributionDao extends BaseDAO {
         return sum != null ? sum.intValue() : 0;
     }
 
+    public int getAggregateRequiredForPaper(Long examId, Long paperId) throws SQLException {
+        if (examId == null || paperId == null) {
+            return 0;
+        }
+        String sql = "SELECT COALESCE(SUM(pd.required), 0) FROM paper_distribution pd " +
+                     "JOIN question_papers qp ON pd.paper_id = qp.id " +
+                     "WHERE qp.exam_id = ? AND pd.paper_id = ?";
+        Long sum = queryOne(sql, rs -> rs.getLong(1), examId, paperId);
+        return sum != null ? sum.intValue() : 0;
+    }
+
     public int updateStatusWithVersion(Long id, DistributionStatus newStatus, int expectedVersion) throws SQLException {
         if (id == null || newStatus == null) {
             throw new IllegalArgumentException("Id and status must not be null");

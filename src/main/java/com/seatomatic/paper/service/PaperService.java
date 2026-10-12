@@ -154,6 +154,28 @@ public class PaperService implements PaperQueryService {
         }
     }
 
+    /**
+     * Validates that total printed stock for every question paper set in an exam
+     * is sufficient to cover aggregate requirements across all allocated examination rooms.
+     */
+    public List<String> validateAggregateStockSufficiency(Long examId) throws SQLException {
+        if (examId == null) {
+            return List.of();
+        }
+        List<QuestionPaper> papers = questionPaperDao.findByExamId(examId);
+        List<String> shortfalls = new java.util.ArrayList<>();
+        for (QuestionPaper qp : papers) {
+            int aggregateRequired = paperDistributionDao.getAggregateRequiredForPaper(examId, qp.getId());
+            if (qp.getTotalCopies() < aggregateRequired) {
+                int deficit = aggregateRequired - qp.getTotalCopies();
+                String msg = String.format("Stock deficit for Set '%s' (Subject %d): Required across rooms=%d, available=%d (Deficit: %d)",
+                        qp.getSetCode(), qp.getSubjectId(), aggregateRequired, qp.getTotalCopies(), deficit);
+                shortfalls.add(msg);
+            }
+        }
+        return shortfalls;
+    }
+
     private void validatePaperInput(Long examId, Long subjectId, String setCode, int totalCopies)
             throws ValidationException {
         if (examId == null || examId <= 0) {
