@@ -34,4 +34,12 @@ class CsrfTokenManagerTest {
 
         assertFalse(CsrfTokenManager.isValid(session, "different"));
     }
+
+    @Test
+    void rejectsMalformedSessionAttribute() {
+        HttpSession session = mock(HttpSession.class);
+        when(session.getAttribute(CsrfTokenManager.SESSION_KEY)).thenReturn(42);
+
+        assertFalse(CsrfTokenManager.isValid(session, "token"));
+    }
 }

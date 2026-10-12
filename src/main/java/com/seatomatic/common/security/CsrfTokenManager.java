@@ -19,7 +19,11 @@ public final class CsrfTokenManager {
     }
 
     public static String token(HttpSession session) {
-        return (String) session.getAttribute(SESSION_KEY);
+        if (session == null) {
+            return null;
+        }
+        Object token = session.getAttribute(SESSION_KEY);
+        return token instanceof String value ? value : null;
     }
 
     public static boolean isValid(HttpSession session, String incomingToken) {
