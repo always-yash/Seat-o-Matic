@@ -92,6 +92,24 @@ public class PaperService implements PaperQueryService {
         }
     }
 
+    /**
+     * Deletes a question paper set after verifying that no room distribution dependencies exist.
+     */
+    public boolean deletePaperSet(Long paperId, Long actorUserId) throws SQLException, ValidationException {
+        if (paperId == null || paperId <= 0) {
+            throw new ValidationException("A valid Question Paper ID is required for deletion.");
+        }
+        if (questionPaperDao.hasActiveDistributions(paperId)) {
+            throw new ValidationException("Cannot delete question paper set: Active distribution records depend on this paper set.");
+        }
+        int deleted = questionPaperDao.delete(paperId);
+        if (deleted > 0 && auditPublisher != null && actorUserId != null) {
+            auditPublisher.publish("DELETE_PAPER_SET", String.valueOf(actorUserId),
+                    "QUESTION_PAPER", paperId, "{\"deleted\":true}");
+        }
+        return deleted > 0;
+    }
+
     public List<QuestionPaper> getPapersForExam(Long examId) throws SQLException {
         if (examId == null) {
             return List.of();
