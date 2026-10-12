@@ -126,7 +126,10 @@ public abstract class BaseController extends HttpServlet {
     }
 
     protected void redirect(HttpServletRequest request, HttpServletResponse response, String path) throws IOException {
-        response.sendRedirect(response.encodeRedirectURL(request.getContextPath() + path));
+        String contextPath = request.getContextPath();
+        String target = (contextPath == null || contextPath.isEmpty()) ? path : contextPath + path;
+        String encoded = response.encodeRedirectURL(target);
+        response.sendRedirect(encoded != null ? encoded : target);
     }
 
     // ==========================================

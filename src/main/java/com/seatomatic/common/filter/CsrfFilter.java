@@ -20,6 +20,12 @@ public class CsrfFilter implements Filter {
             HttpSession session = httpRequest.getSession(false);
             if (session != null && !isLoginPath(httpRequest)) {
                 String submittedToken = httpRequest.getParameter("_csrf");
+                if (submittedToken == null || submittedToken.isBlank()) {
+                    submittedToken = httpRequest.getHeader("X-CSRF-TOKEN");
+                    if (submittedToken == null || submittedToken.isBlank()) {
+                        submittedToken = httpRequest.getHeader("X-Csrf-Token");
+                    }
+                }
                 if (submittedToken == null || !CsrfTokenManager.isValid(session, submittedToken)) {
                     httpResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "Invalid CSRF token");
                     return;
