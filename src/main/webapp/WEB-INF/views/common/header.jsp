@@ -5,10 +5,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><c:out value="${empty pageTitle ? 'Seat-o-Matic' : pageTitle}" /></title>
+    <title><c:out value="${empty pageTitle ? 'Seat-o-Matic — Exam Orchestration' : pageTitle}" /></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
 </head>
 <body>
@@ -35,3 +35,11 @@
         </form>
     </div>
 </header>
+<c:if test="${not empty sessionScope.flashMessage}">
+    <div class="page-shell" style="padding-top: 18px; padding-bottom: 0;">
+        <div class="alert alert-${sessionScope.flashMessage.type.name().toLowerCase()}" role="alert">
+            <c:out value="${sessionScope.flashMessage.message}" />
+        </div>
+    </div>
+    <c:remove var="flashMessage" scope="session" />
+</c:if>
