@@ -1498,6 +1498,5 @@ Every member must be able to defend **their module end to end** and **the shared
 
 Distributed under the **MIT License** (`LICENSE`). 
 Developed at ACEIT, Jaipur under the guidance of `< Er. Ram Babu Buri >`.
-Developers include Surolia Pandit, Khati Bhai, Shivraj Boss, Vedu Pandit and Choudhary Saab.
 
 ---
