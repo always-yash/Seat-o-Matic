@@ -1,4 +1,4 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
@@ -21,6 +21,9 @@
         <a href="${pageContext.request.contextPath}/students">Students</a>
         <a href="${pageContext.request.contextPath}/exams">Exams</a>
         <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
+        <a href="${pageContext.request.contextPath}/papers">Papers</a>
+        <a href="${pageContext.request.contextPath}/distribution">Distribution</a>
+        <a href="${pageContext.request.contextPath}/invigilator/room">Invigilation</a>
         <a href="${pageContext.request.contextPath}/reports">Reports</a>
     </nav>
     <div class="topbar-actions">
