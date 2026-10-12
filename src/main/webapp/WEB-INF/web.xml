@@ -78,6 +78,30 @@
         <url-pattern>/invigilator</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>StudentServlet</servlet-name>
+        <servlet-class>com.seatomatic.student.controller.StudentServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentServlet</servlet-name>
+        <url-pattern>/students</url-pattern>
+        <url-pattern>/students/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>StudentImportServlet</servlet-name>
+        <servlet-class>com.seatomatic.student.controller.StudentImportServlet</servlet-class>
+        <multipart-config>
+            <max-file-size>10485760</max-file-size>
+            <max-request-size>15728640</max-request-size>
+            <file-size-threshold>1048576</file-size-threshold>
+        </multipart-config>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>StudentImportServlet</servlet-name>
+        <url-pattern>/students/import</url-pattern>
+    </servlet-mapping>
+
     <session-config>
         <session-timeout>30</session-timeout>
         <cookie-config>
