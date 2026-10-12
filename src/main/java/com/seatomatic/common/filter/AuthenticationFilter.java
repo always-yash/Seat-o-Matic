@@ -155,11 +155,14 @@ public class AuthenticationFilter implements Filter {
      * Detects if the incoming request expects a JSON response.
      */
     protected static boolean isJsonRequest(HttpServletRequest request) {
+        if (request == null) {
+            return false;
+        }
         String acceptHeader = request.getHeader("Accept");
         String requestedWith = request.getHeader("X-Requested-With");
         String uri = request.getRequestURI();
         return (acceptHeader != null && acceptHeader.contains("application/json"))
                 || "XMLHttpRequest".equalsIgnoreCase(requestedWith)
-                || uri.contains("/api/");
+                || (uri != null && uri.contains("/api/"));
     }
 }
