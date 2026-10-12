@@ -75,3 +75,4 @@ public class BatchImportRow implements Serializable {
         this.status = (status != null && "INACTIVE".equalsIgnoreCase(status.trim())) ? "INACTIVE" : "ACTIVE";
     }
 }
+

@@ -89,3 +89,4 @@ INSERT IGNORE INTO subjects (id, code, name) VALUES
 (2, 'CS102', 'Database Management Systems'),
 (3, 'EC101', 'Digital Signal Processing'),
 (4, 'ME101', 'Thermodynamics');
+

@@ -75,3 +75,4 @@ public class BatchGroupStatsDTO implements Serializable {
         this.inactiveStudents = inactiveStudents;
     }
 }
+

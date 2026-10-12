@@ -160,3 +160,4 @@ public class StudentDetailDTO implements Serializable {
         return b + (sec.isEmpty() ? "" : " · " + sec) + (sem.isEmpty() ? "" : " · " + sem);
     }
 }
+

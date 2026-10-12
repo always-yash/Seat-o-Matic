@@ -118,3 +118,4 @@ public class StudentFilter implements Serializable {
         return keyword != null || branchId != null || sectionId != null || semesterId != null || status != null;
     }
 }
+

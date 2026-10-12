@@ -87,3 +87,4 @@ All routes require authentication and are authorized strictly for `ADMIN` and `F
 2. **CSRF Protection:** Form submissions require session-backed CSRF tokens validated by `CsrfFilter` supporting both `_csrf` form fields and `X-CSRF-TOKEN` headers.
 3. **SQL Injection Immunity:** Every database operation in `StudentDao`, `AcademicLookupDao`, and `StudentEligibilityDao` utilizes parameterized `PreparedStatement` execution via `BaseDAO`.
 4. **Audit Traceability:** Key student lifecycle events (`STUDENT_REGISTER`, `STUDENT_UPDATE`, `STUDENT_STATUS_TOGGLE`, `STUDENT_DELETE`, `STUDENT_BATCH_IMPORT`) publish structured audit logs.
+
