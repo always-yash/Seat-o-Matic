@@ -123,14 +123,17 @@ public class AuthorizationFilter implements Filter {
                     || path.startsWith("/rooms")
                     || path.startsWith("/seating")
                     || path.startsWith("/papers")
+                    || path.startsWith("/distribution")
                     || path.startsWith("/reports")
-                    || path.startsWith("/invigilation");
+                    || path.startsWith("/invigilation")
+                    || path.startsWith("/invigilator");
         }
 
         // INVIGILATOR tier permissions
         if (role == Role.INVIGILATOR) {
             // Invigilator can manage papers and examine seating/room status, but cannot edit master entities
-            if (path.startsWith("/papers") || path.startsWith("/invigilation")) {
+            if (path.startsWith("/papers") || path.startsWith("/distribution")
+                    || path.startsWith("/invigilation") || path.startsWith("/invigilator")) {
                 return true;
             }
             if (path.startsWith("/seating/view") || path.startsWith("/seating/room")) {
