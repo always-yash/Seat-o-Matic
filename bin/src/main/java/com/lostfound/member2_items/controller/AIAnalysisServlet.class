@@ -1,0 +1,18 @@
+// Source code is decompiled from a .class file using FernFlower decompiler (from Intellij IDEA).
+package src.main.java.com.lostfound.member2_items.controller;
+
+public class AIAnalysisServlet {
+
+   private final AIAnalysisService aiService;
+   private final Gson gson;
+
+   public AIAnalysisServlet() {
+      throw new Error("Unresolved compilation problems: \n\tThe type java.lang.Object cannot be resolved. It is indirectly referenced from required .class files\n\tThe type java.lang.Object cannot be resolved. It is indirectly referenced from required .class files\n\tThe declared package \"com.lostfound.member2_items.controller\" does not match the expected package \"src.main.java.com.lostfound.member2_items.controller\"\n\tThe import com cannot be resolved\n\tThe import com cannot be resolved\n\tThe import jakarta cannot be resolved\n\tThe import jakarta cannot be resolved\n\tThe import jakarta cannot be resolved\n\tThe import jakarta cannot be resolved\n\tThe import jakarta cannot be resolved\n\tThe import java.io cannot be resolved\n\tThe import java.util cannot be resolved\n\tThe import java.util cannot be resolved\n\tWebServlet cannot be resolved to a type\n\tHttpServlet cannot be resolved to a type\n\tAIAnalysisService cannot be resolved to a type\n\tAIAnalysisService cannot be resolved to a type\n\tGson cannot be resolved to a type\n\tGson cannot be resolved to a type\n\tOverride cannot be resolved to a type\n\tHttpServletRequest cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a type\n\tServletException cannot be resolved to a type\n\tIOException cannot be resolved to a type\n\tMap cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tHashMap cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a variable\n\tString cannot be resolved to a type\n\tAIAnalysisService cannot be resolved to a type\n\tException cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a variable\n\tGson cannot be resolved to a type\n");
+   }
+
+   @Override
+
+   protected void doPost(HttpServletRequest var1, HttpServletResponse var2) throws ServletException, IOException {
+      throw new Error("Unresolved compilation problems: \n\tOverride cannot be resolved to a type\n\tHttpServletRequest cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a type\n\tServletException cannot be resolved to a type\n\tIOException cannot be resolved to a type\n\tMap cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tHashMap cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tString cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a variable\n\tString cannot be resolved to a type\n\tAIAnalysisService cannot be resolved to a type\n\tException cannot be resolved to a type\n\tHttpServletResponse cannot be resolved to a variable\n\tGson cannot be resolved to a type\n");
+   }
+}

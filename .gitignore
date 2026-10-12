@@ -1,0 +1,18 @@
+# Environment files
+.env
+.env.*
+!.env.example
+
+# Build target & logs
+target/
+*.log
+*.tmp
+lost_found_db_data.*
+
+# IDE files
+.idea/
+*.iml
+.vscode/
+.settings/
+.classpath
+.project
