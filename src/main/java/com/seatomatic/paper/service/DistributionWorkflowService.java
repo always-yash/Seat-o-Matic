@@ -168,6 +168,92 @@ public class DistributionWorkflowService {
     }
 
     /**
+     * Optimistic lock guarded transition: PENDING -> PREPARED.
+     */
+    public void markPreparedWithOptimisticLock(Long distributionId, int expectedVersion, Long actorUserId) throws Exception {
+        PaperDistribution dist = loadDistribution(distributionId);
+        if (!dist.getStatus().canTransitionTo(DistributionStatus.PREPARED)) {
+            throw new ValidationException(String.format(
+                    "Illegal state transition: Cannot transition from %s to PREPARED.", dist.getStatus()));
+        }
+        Optional<QuestionPaper> paperOpt = questionPaperDao.findById(dist.getPaperId());
+        if (paperOpt.isPresent() && paperOpt.get().getTotalCopies() < dist.getRequired()) {
+            throw new ValidationException(String.format(
+                    "Stock shortfall: Required %d copies, available %d.", dist.getRequired(), paperOpt.get().getTotalCopies()));
+        }
+
+        int updated = paperDistributionDao.updateStatusWithVersion(dist.getId(), DistributionStatus.PREPARED, expectedVersion);
+        if (updated == 0) {
+            throw new ValidationException("Concurrent modification detected: Packet " + distributionId +
+                    " was modified by another transaction.");
+        }
+
+        dist.setStatus(DistributionStatus.PREPARED);
+        dist.setVersion(expectedVersion + 1);
+        logAudit("PREPARE_PACKET_OPTIMISTIC", actorUserId, dist.getId(),
+                String.format("{\"version\":%d,\"status\":\"PREPARED\"}", expectedVersion + 1));
+    }
+
+    /**
+     * Optimistic lock guarded transition: PREPARED -> DISTRIBUTED.
+     */
+    public void markDistributedWithOptimisticLock(Long distributionId, int distributedCount, int expectedVersion, Long actorUserId)
+            throws Exception {
+        PaperDistribution dist = loadDistribution(distributionId);
+        if (!dist.getStatus().canTransitionTo(DistributionStatus.DISTRIBUTED)) {
+            throw new ValidationException(String.format(
+                    "Illegal state transition: Cannot transition from %s to DISTRIBUTED.", dist.getStatus()));
+        }
+        if (distributedCount <= 0) {
+            throw new ValidationException("Distributed count must be greater than zero.");
+        }
+
+        int updated = paperDistributionDao.updateDistributedWithVersion(dist.getId(), distributedCount, DistributionStatus.DISTRIBUTED, expectedVersion);
+        if (updated == 0) {
+            throw new ValidationException("Concurrent modification detected: Packet " + distributionId +
+                    " was modified by another transaction.");
+        }
+
+        dist.setDistributed(distributedCount);
+        dist.setStatus(DistributionStatus.DISTRIBUTED);
+        dist.setVersion(expectedVersion + 1);
+        logAudit("DISPATCH_PAPERS_OPTIMISTIC", actorUserId, dist.getId(),
+                String.format("{\"version\":%d,\"distributed\":%d}", expectedVersion + 1, distributedCount));
+    }
+
+    /**
+     * Optimistic lock guarded transition: DISTRIBUTED -> VERIFIED.
+     */
+    public void recordCollectionAndVerifyWithOptimisticLock(Long distributionId, int collectedCount, int expectedVersion, Long actorUserId)
+            throws Exception {
+        PaperDistribution dist = loadDistribution(distributionId);
+        if (dist.getStatus() == DistributionStatus.VERIFIED) {
+            throw new ValidationException("Distribution record is already VERIFIED.");
+        }
+        if (!dist.getStatus().canTransitionTo(DistributionStatus.VERIFIED)) {
+            throw new ValidationException(String.format(
+                    "Illegal state transition: Cannot transition from %s to VERIFIED.", dist.getStatus()));
+        }
+        if (collectedCount != dist.getDistributed()) {
+            throw new ValidationException(String.format(
+                    "Reconciliation failure: Collected count (%d) does not match distributed count (%d).",
+                    collectedCount, dist.getDistributed()));
+        }
+
+        int updated = paperDistributionDao.updateCollectedWithVersion(dist.getId(), collectedCount, DistributionStatus.VERIFIED, expectedVersion);
+        if (updated == 0) {
+            throw new ValidationException("Concurrent modification detected: Packet " + distributionId +
+                    " was modified by another transaction.");
+        }
+
+        dist.setCollected(collectedCount);
+        dist.setStatus(DistributionStatus.VERIFIED);
+        dist.setVersion(expectedVersion + 1);
+        logAudit("VERIFY_RECONCILIATION_OPTIMISTIC", actorUserId, dist.getId(),
+                String.format("{\"version\":%d,\"collected\":%d}", expectedVersion + 1, collectedCount));
+    }
+
+    /**
      * Prepares all PENDING distribution packets for an exam in a single transaction.
      */
     public int prepareAllPending(Long examId, Long actorUserId) throws Exception {

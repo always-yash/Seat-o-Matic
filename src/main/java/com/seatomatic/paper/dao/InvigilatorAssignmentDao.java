@@ -15,7 +15,7 @@ import java.util.Optional;
 public class InvigilatorAssignmentDao extends BaseDAO {
 
     private static final String SELECT_BASE =
-            "SELECT ia.id, ia.exam_id, ia.room_id, ia.invigilator_id, ia.status, ia.created_at, ia.updated_at, " +
+            "SELECT ia.id, ia.exam_id, ia.room_id, ia.invigilator_id, ia.status, ia.check_in_time, ia.created_at, ia.updated_at, " +
             "       u.username AS invigilator_username, u.username AS invigilator_name, " +
             "       r.room_code, e.title AS exam_title " +
             "FROM invigilator_assignments ia " +
@@ -96,6 +96,15 @@ public class InvigilatorAssignmentDao extends BaseDAO {
         return executeUpdate(sql, status.trim().toUpperCase(), id);
     }
 
+    public int recordCheckIn(Long examId, Long roomId, Long invigilatorId) throws SQLException {
+        if (examId == null || roomId == null || invigilatorId == null) {
+            return 0;
+        }
+        String sql = "UPDATE invigilator_assignments SET check_in_time = CURRENT_TIMESTAMP, status = 'ACTIVE' " +
+                     "WHERE exam_id = ? AND room_id = ? AND invigilator_id = ? AND check_in_time IS NULL";
+        return executeUpdate(sql, examId, roomId, invigilatorId);
+    }
+
     public int delete(Long id) throws SQLException {
         if (id == null) {
             return 0;
@@ -111,6 +120,10 @@ public class InvigilatorAssignmentDao extends BaseDAO {
         a.setRoomId(rs.getLong("room_id"));
         a.setInvigilatorId(rs.getLong("invigilator_id"));
         a.setStatus(rs.getString("status"));
+        try {
+            a.setCheckInTime(rs.getTimestamp("check_in_time"));
+        } catch (SQLException ignored) {
+        }
         a.setCreatedAt(rs.getTimestamp("created_at"));
         a.setUpdatedAt(rs.getTimestamp("updated_at"));
         a.setInvigilatorUsername(rs.getString("invigilator_username"));

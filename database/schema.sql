@@ -161,6 +161,7 @@ CREATE TABLE paper_distribution (
     distributed INT NOT NULL DEFAULT 0,
     collected INT NOT NULL DEFAULT 0,
     status ENUM('PENDING','PREPARED','DISTRIBUTED','VERIFIED') NOT NULL DEFAULT 'PENDING',
+    version INT NOT NULL DEFAULT 0,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_paper_distribution_plan FOREIGN KEY (plan_id) REFERENCES seating_plans(id),
@@ -177,6 +178,7 @@ CREATE TABLE invigilator_assignments (
     room_id BIGINT NOT NULL,
     invigilator_id BIGINT NOT NULL,
     status ENUM('ASSIGNED','ACTIVE','COMPLETED') NOT NULL DEFAULT 'ASSIGNED',
+    check_in_time TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_invigilator_exam FOREIGN KEY (exam_id) REFERENCES exams(id),
@@ -185,6 +187,24 @@ CREATE TABLE invigilator_assignments (
     UNIQUE KEY uq_exam_room_invigilator (exam_id, room_id, invigilator_id),
     INDEX idx_invigilator_user (invigilator_id),
     INDEX idx_invigilator_exam_room (exam_id, room_id)
+);
+
+CREATE TABLE paper_discrepancies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    distribution_id BIGINT NULL,
+    exam_id BIGINT NOT NULL,
+    room_id BIGINT NOT NULL,
+    incident_type VARCHAR(60) NOT NULL,
+    count_affected INT NOT NULL DEFAULT 0,
+    description TEXT,
+    reported_by BIGINT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'REPORTED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    CONSTRAINT fk_discrepancy_exam FOREIGN KEY (exam_id) REFERENCES exams(id),
+    CONSTRAINT fk_discrepancy_room FOREIGN KEY (room_id) REFERENCES rooms(id),
+    INDEX idx_discrepancy_exam (exam_id),
+    INDEX idx_discrepancy_room (room_id)
 );
 
 CREATE TABLE audit_logs (

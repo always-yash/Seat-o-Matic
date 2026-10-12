@@ -15,6 +15,7 @@ ALTER TABLE paper_distribution
     ADD COLUMN IF NOT EXISTS distributed INT NOT NULL DEFAULT 0 AFTER buffer,
     ADD COLUMN IF NOT EXISTS collected INT NOT NULL DEFAULT 0 AFTER distributed,
     ADD COLUMN IF NOT EXISTS status ENUM('PENDING','PREPARED','DISTRIBUTED','VERIFIED') NOT NULL DEFAULT 'PENDING' AFTER collected,
+    ADD COLUMN IF NOT EXISTS version INT NOT NULL DEFAULT 0 AFTER status,
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at;
 
 -- Create indexes for room and status filtering on paper_distribution
@@ -38,6 +39,7 @@ DEALLOCATE PREPARE stmt_idx_room;
 
 -- 2. Align invigilator_assignments with update timestamp and lookup indexes
 ALTER TABLE invigilator_assignments
+    ADD COLUMN IF NOT EXISTS check_in_time TIMESTAMP NULL AFTER status,
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at;
 
 SET @exist_idx_invig_user := (
@@ -67,3 +69,20 @@ SET @sql_idx_qp := IF(@exist_idx_qp = 0, 'CREATE INDEX idx_qp_exam_subject ON qu
 PREPARE stmt_idx_qp FROM @sql_idx_qp;
 EXECUTE stmt_idx_qp;
 DEALLOCATE PREPARE stmt_idx_qp;
+
+-- 4. Create paper_discrepancies table for room incidents and script reconciliation issues
+CREATE TABLE IF NOT EXISTS paper_discrepancies (
+    id BIGINT PRIMARY KEY AUTO_INCREMENT,
+    distribution_id BIGINT NULL,
+    exam_id BIGINT NOT NULL,
+    room_id BIGINT NOT NULL,
+    incident_type VARCHAR(60) NOT NULL,
+    count_affected INT NOT NULL DEFAULT 0,
+    description TEXT,
+    reported_by BIGINT NOT NULL,
+    status VARCHAR(30) NOT NULL DEFAULT 'REPORTED',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    resolved_at TIMESTAMP NULL,
+    INDEX idx_discrepancy_exam (exam_id),
+    INDEX idx_discrepancy_room (room_id)
+);
