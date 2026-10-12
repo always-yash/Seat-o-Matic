@@ -178,6 +178,7 @@ CREATE TABLE invigilator_assignments (
     room_id BIGINT NOT NULL,
     invigilator_id BIGINT NOT NULL,
     status ENUM('ASSIGNED','ACTIVE','COMPLETED') NOT NULL DEFAULT 'ASSIGNED',
+    check_in_time TIMESTAMP NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT fk_invigilator_exam FOREIGN KEY (exam_id) REFERENCES exams(id),

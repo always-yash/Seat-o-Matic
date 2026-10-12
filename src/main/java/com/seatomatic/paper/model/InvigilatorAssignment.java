@@ -11,6 +11,7 @@ public class InvigilatorAssignment {
     private Long roomId;
     private Long invigilatorId;
     private String status = "ASSIGNED";
+    private Timestamp checkInTime;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -79,6 +80,14 @@ public class InvigilatorAssignment {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public Timestamp getCheckInTime() {
+        return checkInTime;
+    }
+
+    public void setCheckInTime(Timestamp checkInTime) {
+        this.checkInTime = checkInTime;
     }
 
     public Timestamp getCreatedAt() {

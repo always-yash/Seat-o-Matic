@@ -257,4 +257,21 @@ public class InvigilationService extends BaseDAO {
         }
         return assignmentDao.findByInvigilatorId(invigilatorId);
     }
+
+    /**
+     * Records official room check-in timestamp for an assigned invigilator.
+     * Enforces IDOR verifyAccess before checking in.
+     */
+    public boolean recordCheckIn(Long examId, Long roomId, Long authenticatedUserId, Role authenticatedRole)
+            throws Exception {
+        verifyAccess(examId, roomId, authenticatedUserId, authenticatedRole);
+        int updated = assignmentDao.recordCheckIn(examId, roomId, authenticatedUserId);
+        if (updated > 0 && auditPublisher != null) {
+            auditPublisher.publish("INVIGILATOR_CHECK_IN", String.valueOf(authenticatedUserId),
+                    "EXAM_ROOM", roomId,
+                    String.format("{\"examId\":%d,\"roomId\":%d,\"invigilatorId\":%d}",
+                            examId, roomId, authenticatedUserId));
+        }
+        return updated > 0;
+    }
 }

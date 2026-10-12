@@ -39,6 +39,7 @@ DEALLOCATE PREPARE stmt_idx_room;
 
 -- 2. Align invigilator_assignments with update timestamp and lookup indexes
 ALTER TABLE invigilator_assignments
+    ADD COLUMN IF NOT EXISTS check_in_time TIMESTAMP NULL AFTER status,
     ADD COLUMN IF NOT EXISTS updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP AFTER created_at;
 
 SET @exist_idx_invig_user := (
