@@ -21,12 +21,27 @@ import java.sql.SQLException;
 public class LoginServlet extends BaseController {
     private static final Logger LOGGER = LoggerFactory.getLogger(LoginServlet.class);
     private static final String DEBUG_ERRORS_PROPERTY = "seatomatic.auth.debugErrors";
-    private final AuthService authService = new AuthService();
-    private final AuditPublisher auditPublisher = new AuditPublisherImpl();
+
+    private final AuthService authService;
+    private final AuditPublisher auditPublisher;
+
+    public LoginServlet() {
+        this(new AuthService(), new AuditPublisherImpl());
+    }
+
+    public LoginServlet(AuthService authService, AuditPublisher auditPublisher) {
+        this.authService = authService;
+        this.auditPublisher = auditPublisher;
+    }
 
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+        if (isAuthenticated(request)) {
+            redirect(request, response, "/dashboard");
+            return;
+        }
+
         HttpSession session = request.getSession(true);
         String token = CsrfTokenManager.token(session);
         if (token == null) {
@@ -41,6 +56,12 @@ public class LoginServlet extends BaseController {
             throws ServletException, IOException {
         String username = parameter(request, "username");
         String password = request.getParameter("password");
+
+        if (username.isEmpty() || password == null || password.isBlank()) {
+            showLoginError(request, response, "Username and password are required.");
+            return;
+        }
+
         try {
             User user = authService.authenticate(username, password);
             if (user == null) {
@@ -77,7 +98,7 @@ public class LoginServlet extends BaseController {
     }
 
     private void handleAuthenticationException(HttpServletRequest request, HttpServletResponse response,
-                                               Exception exception)
+                                                Exception exception)
             throws ServletException, IOException {
         if (Boolean.getBoolean(DEBUG_ERRORS_PROPERTY)) {
             response.setStatus(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);

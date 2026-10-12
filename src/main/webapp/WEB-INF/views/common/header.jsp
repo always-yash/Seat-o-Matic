@@ -1,14 +1,14 @@
-﻿<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title><c:out value="${empty pageTitle ? 'Seat-o-Matic' : pageTitle}" /></title>
+    <title><c:out value="${empty pageTitle ? 'Seat-o-Matic — Exam Orchestration' : pageTitle}" /></title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="${pageContext.request.contextPath}/assets/css/main.css">
 </head>
 <body>
@@ -18,9 +18,13 @@
     </a>
     <nav class="topnav" aria-label="Primary navigation">
         <a href="${pageContext.request.contextPath}/dashboard">Overview</a>
-        <a href="${pageContext.request.contextPath}/students">Students</a>
-        <a href="${pageContext.request.contextPath}/exams">Exams</a>
-        <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
+        <c:if test="${sessionScope.userRole == 'ADMIN' || sessionScope.userRole == 'FACULTY'}">
+            <a href="${pageContext.request.contextPath}/students">Students</a>
+            <a href="${pageContext.request.contextPath}/exams">Exams</a>
+            <a href="${pageContext.request.contextPath}/rooms">Rooms</a>
+        </c:if>
+        <a href="${pageContext.request.contextPath}/seating/plan">Seating</a>
+        <a href="${pageContext.request.contextPath}/papers">Papers</a>
         <a href="${pageContext.request.contextPath}/reports">Reports</a>
     </nav>
     <div class="topbar-actions">
@@ -32,3 +36,11 @@
         </form>
     </div>
 </header>
+<c:if test="${not empty sessionScope.flashMessage}">
+    <div class="page-shell" style="padding-top: 18px; padding-bottom: 0;">
+        <div class="alert alert-${sessionScope.flashMessage.type.name().toLowerCase()}" role="alert">
+            <c:out value="${sessionScope.flashMessage.message}" />
+        </div>
+    </div>
+    <c:remove var="flashMessage" scope="session" />
+</c:if>
