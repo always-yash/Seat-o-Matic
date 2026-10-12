@@ -18,6 +18,7 @@ public class PaperDistributionDao extends BaseDAO {
     private static final String SELECT_BASE =
             "SELECT pd.id, pd.plan_id, pd.room_id, pd.paper_id, pd.required, pd.buffer, " +
             "       pd.distributed, pd.collected, pd.status, pd.created_at, pd.updated_at, " +
+            "       COALESCE(pd.version, 0) AS version, " +
             "       r.room_code, qp.exam_id, qp.subject_id, qp.set_code, s.code AS subject_code, s.name AS subject_name " +
             "FROM paper_distribution pd " +
             "JOIN rooms r ON pd.room_id = r.id " +
@@ -158,6 +159,30 @@ public class PaperDistributionDao extends BaseDAO {
         return sum != null ? sum.intValue() : 0;
     }
 
+    public int updateStatusWithVersion(Long id, DistributionStatus newStatus, int expectedVersion) throws SQLException {
+        if (id == null || newStatus == null) {
+            throw new IllegalArgumentException("Id and status must not be null");
+        }
+        String sql = "UPDATE paper_distribution SET status = ?, version = version + 1 WHERE id = ? AND version = ?";
+        return executeUpdate(sql, newStatus.name(), id, expectedVersion);
+    }
+
+    public int updateDistributedWithVersion(Long id, int distributed, DistributionStatus newStatus, int expectedVersion) throws SQLException {
+        if (id == null || distributed < 0 || newStatus == null) {
+            throw new IllegalArgumentException("Invalid distributed count or status");
+        }
+        String sql = "UPDATE paper_distribution SET distributed = ?, status = ?, version = version + 1 WHERE id = ? AND version = ?";
+        return executeUpdate(sql, distributed, newStatus.name(), id, expectedVersion);
+    }
+
+    public int updateCollectedWithVersion(Long id, int collected, DistributionStatus newStatus, int expectedVersion) throws SQLException {
+        if (id == null || collected < 0 || newStatus == null) {
+            throw new IllegalArgumentException("Invalid collected count or status");
+        }
+        String sql = "UPDATE paper_distribution SET collected = ?, status = ?, version = version + 1 WHERE id = ? AND version = ?";
+        return executeUpdate(sql, collected, newStatus.name(), id, expectedVersion);
+    }
+
     private PaperDistribution mapRow(ResultSet rs) throws SQLException {
         PaperDistribution dist = new PaperDistribution();
         dist.setId(rs.getLong("id"));
@@ -171,6 +196,11 @@ public class PaperDistributionDao extends BaseDAO {
         dist.setStatus(DistributionStatus.fromString(rs.getString("status")));
         dist.setCreatedAt(rs.getTimestamp("created_at"));
         dist.setUpdatedAt(rs.getTimestamp("updated_at"));
+        try {
+            dist.setVersion(rs.getInt("version"));
+        } catch (SQLException ignored) {
+            dist.setVersion(0);
+        }
         dist.setRoomCode(rs.getString("room_code"));
         dist.setExamId(rs.getLong("exam_id"));
         dist.setSubjectId(rs.getLong("subject_id"));

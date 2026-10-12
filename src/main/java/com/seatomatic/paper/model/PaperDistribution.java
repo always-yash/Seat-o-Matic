@@ -15,6 +15,7 @@ public class PaperDistribution {
     private int distributed;
     private int collected;
     private DistributionStatus status = DistributionStatus.PENDING;
+    private int version = 0;
     private Timestamp createdAt;
     private Timestamp updatedAt;
 
@@ -176,6 +177,14 @@ public class PaperDistribution {
 
     public int getTotalRequired() {
         return required;
+    }
+
+    public int getVersion() {
+        return version;
+    }
+
+    public void setVersion(int version) {
+        this.version = version;
     }
 
     public boolean isReconciled() {
