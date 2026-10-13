@@ -90,6 +90,20 @@ public class SeatingService {
         return view(plans.findById(planId).orElseThrow(() -> new IllegalArgumentException("Seating plan not found.")));
     }
 
+    @Transactional(readOnly = true)
+    public List<LockedPlanReportRow> lockedPlanReportRows() {
+        return plans.findAllByStatusOrderByUpdatedAtDesc(SeatingPlan.Status.LOCKED).stream()
+                .flatMap(plan -> plan.getAssignments().stream().map(assignment -> {
+                    Exam exam = plan.getExam();
+                    Student student = assignment.getStudent();
+                    return new LockedPlanReportRow(exam.getCode(), exam.getName(), exam.getStartsAt(),
+                            exam.getRoom().getName(), assignment.getSeatRow(), assignment.getSeatColumn(),
+                            student.getStudentId(), student.getFullName(), student.getBranch(),
+                            student.getSection(), student.getSemester());
+                }))
+                .toList();
+    }
+
     @Transactional
     public PlanView transition(Long planId, SeatingPlan.Status next) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -193,6 +207,10 @@ public class SeatingService {
     }
 
     private record Seat(int row, int column) { }
+
+    public record LockedPlanReportRow(String examCode, String examName, LocalDateTime startsAt, String roomName,
+                                      int seatRow, int seatColumn, String studentId, String studentName,
+                                      String branch, String section, int semester) { }
 
     public record PlanView(Long id, Long examId, String examCode, String examName, String roomName, int rows,
                            int columns, int capacity, SeatingPlan.Status status, int conflictScore, long version,

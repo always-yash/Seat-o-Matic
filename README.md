@@ -14,7 +14,7 @@ This repository is a Java 17 modular monolith. The modules share one deployable 
 | M2 Student & academic | Shivesh Surolia | `com.seatomatic.student` | Student directory, academic structure, eligibility and imports | Student records, validation, list/create and CSV import API/UI |
 | M3 Exams & rooms | Shivraj Singh | `com.seatomatic.exams` | Exam lifecycle, room grids, capacity, registrations | Exam and room records, candidate registration, capacity validation |
 | M4 Papers & invigilation | Sanjay Jangid | `com.seatomatic.papers` | Paper-set counts, room handovers and invigilator tasks | Plan-driven copy counts, configurable buffer, per-room runs and guarded transitions |
-| M5 Analysis & audit | Ved Prakash Sharma | `com.seatomatic.analysis` | Reports, exports, operational analytics and audit | Dashboard metrics and append-style activity events |
+| M5 Analysis & audit | Ved Prakash Sharma | `com.seatomatic.analysis` | Reports, exports, operational analytics and audit | Dashboard metrics, append-style activity events, and audited locked-plan CSV export |
 
 Each module should own its entities, repositories and service rules. Cross-module work should go through a service/API contract; avoid importing another module's repository into business logic. `core` owns shared security and integration concerns.
 
@@ -94,6 +94,7 @@ All API paths require authentication and CSRF on state-changing requests. Studen
 | `POST` | `/api/v1/seating-plans/{id}/move` | Move a student to an empty seat |
 | `POST` | `/api/v1/seating-plans/{id}/transition` | Review, approve or lock a plan |
 | `POST` | `/api/v1/papers/{id}/transition` | Advance a paper run's handover status |
+| `GET` | `/api/v1/reports/locked-seating.csv` | Admin-only CSV export of locked plans and assigned seats; export is audited |
 
 ## Ownership and collaboration
 
@@ -105,4 +106,4 @@ All API paths require authentication and CSRF on state-changing requests. Studen
 
 ## Current gaps / next increments
 
-This is the new foundation; the legacy lost-and-found code has been removed. Before calling it production-ready, complete password reset and account recovery, academic entities (branches/sections/subjects), blocked-seat editing, multi-room allocation, plan export/print, room-to-invigilator assignment, multiple paper-set configuration, report exports, and automated coverage. CSV import accepts the `studentId,fullName,branch,section,semester` header and reports rejected rows while saving valid records. Admin accounts are stored as BCrypt hashes; the local H2 database and its bootstrap account reset on application restart, while MySQL accounts persist. The demo seed is intended for local evaluation only.
+This is the new foundation; the legacy lost-and-found code has been removed. Before calling it production-ready, complete password reset and account recovery, academic entities (branches/sections/subjects), blocked-seat editing, multi-room allocation, plan export/print, room-to-invigilator assignment, multiple paper-set configuration, remaining report exports, and automated coverage. CSV import accepts the `studentId,fullName,branch,section,semester` header and reports rejected rows while saving valid records. Admin accounts are stored as BCrypt hashes; the local H2 database and its bootstrap account reset on application restart, while MySQL accounts persist. The demo seed is intended for local evaluation only.
