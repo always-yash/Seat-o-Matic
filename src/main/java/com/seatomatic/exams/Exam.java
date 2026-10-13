@@ -8,6 +8,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import jakarta.persistence.Column;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import java.time.LocalDateTime;
@@ -22,6 +23,7 @@ public class Exam {
     @NotBlank private String subject;
     private LocalDateTime startsAt;
     @Min(0) private int expectedStudents;
+    @Column(name = "registration_closed", nullable = false) private boolean registrationClosed;
     @Enumerated(EnumType.STRING) private Status status = Status.DRAFT;
     @ManyToOne private Room room;
 
@@ -38,4 +40,6 @@ public class Exam {
     public int getExpectedStudents() { return expectedStudents; }
     public Status getStatus() { return status; }
     public Room getRoom() { return room; }
+    public boolean isRegistrationClosed() { return registrationClosed; }
+    public void closeCandidateRegistration() { registrationClosed = true; }
 }

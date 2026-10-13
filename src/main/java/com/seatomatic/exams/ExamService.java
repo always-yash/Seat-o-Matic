@@ -45,6 +45,7 @@ public class ExamService {
     }
     @Transactional public ExamCandidate registerCandidate(Long examId, String studentId) {
         Exam exam = requireExam(examId);
+        if (exam.isRegistrationClosed()) throw new IllegalArgumentException("Candidate registration is closed because a seating plan has been generated.");
         if (candidates.findByExamIdOrderByStudentFullName(examId).size() >= exam.getExpectedStudents()) {
             throw new IllegalArgumentException("The registered roster already matches the expected student count.");
         }
@@ -55,6 +56,13 @@ public class ExamService {
         ExamCandidate candidate = candidates.save(new ExamCandidate(exam, student));
         audit.record("CANDIDATE_REGISTERED", "Examination", exam.getCode() + " · " + student.getStudentId());
         return candidate;
+    }
+    @Transactional public void closeCandidateRegistration(Long examId) {
+        Exam exam = requireExam(examId);
+        if (!exam.isRegistrationClosed()) {
+            exam.closeCandidateRegistration();
+            audit.record("CANDIDATE_REGISTRATION_CLOSED", "Examination", exam.getCode());
+        }
     }
     private Exam requireExam(Long id) { return exams.findById(id).orElseThrow(() -> new IllegalArgumentException("Examination not found.")); }
     public record CreateRoom(String name, String building, int rows, int columns, int capacity) { }

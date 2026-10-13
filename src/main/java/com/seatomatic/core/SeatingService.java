@@ -70,6 +70,7 @@ public class SeatingService {
         }
         int score = score(arrangement);
         paperRuns.prepareRequirement(exam, room, roster.size());
+        exams.closeCandidateRegistration(examId);
         plan.clearAssignments();
         entityManager.flush();
         plan.replaceAssignments(arrangement, score);
