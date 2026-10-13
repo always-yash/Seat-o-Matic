@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#f5f6f2"><title>Overview · Seat-o-Matic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body>
+<div class="app-shell">
+  <div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div>
+  <main class="main-content">
+    <header class="topbar"><div class="breadcrumb"><span>Workspace</span><b>/</b><strong>Overview</strong></div><div class="topbar-actions"><span class="live-indicator"><i></i> Session live</span><span class="topbar-date" id="today-label"></span><button class="icon-button" aria-label="Notifications">♧<i class="notification-dot"></i></button></div></header>
+    <section class="page-wrap">
+      <div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> EXAM CELL · OPERATIONS</div><h1>Good morning, team<span class="wave">✳</span></h1><p class="subheading">Your examination operations, at a glance.</p></div><a class="button button-primary" href="/workspace/exams"><span>＋</span> Plan an examination</a></div>
+
+      <section class="hero-panel">
+        <div class="hero-copy"><span class="hero-kicker"><i></i> <span th:text="${nextExamLabel}">NEXT UP</span></span><h2>Exam day,<br><em>under control.</em></h2><p><span th:text="${examCount}">0</span> sessions are on the calendar. Your rooms are taking shape—review the last details before the day begins.</p><a class="hero-link" href="/workspace/exams">Open exam schedule <span>→</span></a></div>
+        <div class="hero-art" aria-hidden="true"><div class="orbit orbit-one"></div><div class="orbit orbit-two"></div><div class="art-sun"></div><div class="art-grid"><span th:each="seat,stat : ${#numbers.sequence(1, 30)}" th:class="${stat.index == 7 or stat.index == 18} ? 'seat-dot seat-dot-muted' : (${stat.index == 12 or stat.index == 13} ? 'seat-dot seat-dot-accent' : 'seat-dot')"></span></div><div class="art-label"><span class="art-label-mark">✓</span><span><strong th:text="${#lists.isEmpty(upcomingExams) ? 'Room standby' : upcomingExams[0].room.name}">Room A-204</strong><small th:text="${#lists.isEmpty(upcomingExams) ? 'Plan your first session' : upcomingExams[0].expectedStudents + ' students expected'}">4 students expected</small></span></div><div class="art-tag">PLAN <strong>01</strong></div></div>
+      </section>
+
+      <section class="metric-grid" aria-label="Workspace summary">
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon icon-students">♙</span><span class="metric-trend">↗ 8.2%</span></div><div class="metric-value" th:text="${studentCount}">0</div><div class="metric-label">Active students</div><div class="metric-foot">Across all academic branches</div><div class="metric-spark spark-green"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon icon-exams">▦</span><span class="metric-period">THIS TERM</span></div><div class="metric-value" th:text="${examCount}">0</div><div class="metric-label">Examinations</div><div class="metric-foot">Scheduled and in preparation</div><div class="metric-spark spark-blue"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon icon-rooms">⌗</span><span class="metric-period">READY TO USE</span></div><div class="metric-value" th:text="${roomCount}">0</div><div class="metric-label">Examination rooms</div><div class="metric-foot">Seat maps and capacity tracked</div><div class="metric-spark spark-amber"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+        <article class="metric-card"><div class="metric-top"><span class="metric-icon icon-papers">▤</span><span class="metric-period">PAPER DESK</span></div><div class="metric-value" th:text="${paperCount}">0</div><div class="metric-label">Paper runs</div><div class="metric-foot">Count, distribute, reconcile</div><div class="metric-spark spark-violet"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></article>
+      </section>
+
+      <section class="content-grid">
+        <article class="panel schedule-panel"><div class="panel-heading"><div><div class="eyebrow small-eyebrow">UP NEXT</div><h3>Exam schedule</h3></div><a class="quiet-link" href="/workspace/exams">View calendar <span>→</span></a></div>
+          <div class="table-wrap"><table><thead><tr><th>EXAMINATION</th><th>DATE &amp; TIME</th><th>ROOM</th><th>STUDENTS</th><th>STATUS</th></tr></thead><tbody><tr th:each="exam : ${upcomingExams}"><td><span class="subject-icon" th:text="${#strings.substring(exam.code,0,2)}">CS</span><span class="subject-name"><strong th:text="${exam.name}">Distributed systems</strong><small th:text="${exam.code + ' · ' + exam.subject}">CS-501 · Subject</small></span></td><td class="date-cell" th:text="${#strings.replace(#strings.substring(exam.startsAt,0,16),'T',' · ')}">Oct 14 · 09:00</td><td th:text="${exam.room.name}">A-204</td><td><span class="student-count" th:text="${exam.expectedStudents}">46</span></td><td><span class="status-pill" th:classappend="${#strings.toLowerCase(exam.status.name())}" th:text="${exam.status}">READY</span></td></tr>
+            <tr th:if="${#lists.isEmpty(upcomingExams)}"><td colspan="5" class="empty-state">No examinations yet. Create your first session to get started.</td></tr></tbody></table></div>
+        </article>
+        <aside class="panel rooms-panel"><div class="panel-heading"><div><div class="eyebrow small-eyebrow">CAMPUS CAPACITY</div><h3>Rooms at a glance</h3></div><a class="quiet-link icon-quiet" href="/workspace/rooms" aria-label="All rooms">→</a></div>
+          <div class="room-list"><div class="room-row" th:each="room : ${rooms}"><div class="room-thumb"><span>⌗</span><div class="room-mini-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><div class="room-info"><strong th:text="${room.name}">A-204</strong><small th:text="${room.building}">Academic block</small><div class="capacity-track"><i th:style="'width:' + ${room.capacity > 48 ? 96 : room.capacity * 2} + '%' "></i></div></div><span class="capacity-label" th:text="${room.capacity} + ' seats'">46 seats</span></div><div th:if="${#lists.isEmpty(rooms)}" class="empty-room">Rooms will appear here once configured.</div></div>
+          <a class="room-footer" href="/workspace/rooms">Manage rooms and seating <span>→</span></a>
+        </aside>
+      </section>
+
+      <section class="bottom-grid"><article class="panel activity-panel"><div class="panel-heading"><div><div class="eyebrow small-eyebrow">RECENT ACTIVITY</div><h3>What’s happening</h3></div><a th:if="${isAdmin}" class="quiet-link" href="/workspace/analytics">Full audit trail <span>→</span></a></div><div class="activity-list"><div class="activity-item" th:each="event : ${activity}"><span class="activity-dot"></span><div><p><strong th:text="${event.actor}">Exam cell</strong> <span th:text="${#strings.toLowerCase(#strings.replace(event.action,'_',' '))}">reviewed a seating plan</span></p><small th:text="${event.details}">Room A-204 is ready for review.</small></div><time th:text="${#strings.substring(event.createdAt,11,16)}">09:42</time></div><div th:if="${#lists.isEmpty(activity)}" class="empty-state">Activity will appear here as your team works.</div></div></article><article class="tip-card"><div class="tip-icon">✳</div><span class="tip-overline">A GOOD NEXT STEP</span><h3>Keep every seat accountable.</h3><p>Build a room layout, then generate and review the seating plan before locking it for exam day.</p><a href="/workspace/rooms">Set up a room <span>→</span></a><div class="tip-decoration"></div></article></section>
+      <footer class="page-footer"><span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span><span>Built for calm, confident exam days.</span></footer>
+    </section>
+  </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body></html>

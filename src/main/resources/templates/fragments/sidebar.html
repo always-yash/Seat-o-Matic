@@ -1,0 +1,23 @@
+<aside class="sidebar" th:fragment="sidebar(page)">
+  <a class="brand" href="/" aria-label="Seat-o-Matic home">
+    <span class="brand-mark"><svg viewBox="0 0 36 36" aria-hidden="true"><path d="M8 7h8a3 3 0 0 1 3 3v7H8a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Zm12 12h8a3 3 0 0 1 3 3v4a3 3 0 0 1-3 3h-8v-7a3 3 0 0 1 3-3ZM5 21h11v10H8a3 3 0 0 1-3-3v-7Zm19-14h4a3 3 0 0 1 3 3v8H20V10a3 3 0 0 1 4-3Z" fill="currentColor"/></svg></span>
+    <span class="brand-copy"><strong>seat<span>o</span>matic</strong><small>EXAM OPERATIONS</small></span>
+  </a>
+  <div class="nav-caption">WORKSPACE</div>
+  <nav class="primary-nav" aria-label="Primary navigation">
+    <a href="/" th:classappend="${page == 'overview'} ? ' active' : ''"><span class="nav-icon">⌂</span>Overview</a>
+    <a th:if="${isAdmin or isFaculty}" href="/workspace/students" th:classappend="${page == 'students'} ? ' active' : ''"><span class="nav-icon">♙</span>Students<span class="nav-count" th:text="${studentCount != null ? studentCount : ''}"></span></a>
+    <a th:if="${isAdmin or isFaculty}" href="/workspace/exams" th:classappend="${page == 'exams'} ? ' active' : ''"><span class="nav-icon">▦</span>Examinations</a>
+    <a th:if="${isAdmin or isFaculty}" href="/workspace/rooms" th:classappend="${page == 'rooms'} ? ' active' : ''"><span class="nav-icon">⌗</span>Rooms &amp; seats</a>
+    <a th:if="${isAdmin or isFaculty}" href="/workspace/papers" th:classappend="${page == 'papers'} ? ' active' : ''"><span class="nav-icon">▤</span>Paper desk</a>
+  </nav>
+  <div class="nav-caption nav-caption-lower">INSIGHTS</div>
+  <nav class="primary-nav" aria-label="Insights navigation">
+    <a th:if="${isAdmin}" href="/workspace/analytics" th:classappend="${page == 'analytics'} ? ' active' : ''"><span class="nav-icon">↗</span>Reports &amp; audit</a>
+    <a th:if="${isAdmin}" href="/workspace/team" th:classappend="${page == 'team'} ? ' active' : ''"><span class="nav-icon">♧</span>Team access</a>
+  </nav>
+  <div class="sidebar-bottom">
+    <div class="help-card"><span class="help-spark">✳</span><strong>Exam day, in sync.</strong><p>One clear view for every room, seat and paper.</p></div>
+    <div class="user-chip"><span class="avatar" th:text="${#strings.substring(currentUsername,0,1)}">U</span><span class="user-label"><strong th:text="${currentUsername}">User</strong><small th:text="${currentRole}">Workspace role</small></span><form th:action="@{/logout}" method="post"><button class="logout-button" title="Sign out" aria-label="Sign out">↗</button></form></div>
+  </div>
+</aside>

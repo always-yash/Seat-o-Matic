@@ -7,7 +7,6 @@
 target/
 *.log
 *.tmp
-lost_found_db_data.*
 
 # IDE files
 .idea/
