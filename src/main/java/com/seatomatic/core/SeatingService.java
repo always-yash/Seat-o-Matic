@@ -18,6 +18,7 @@ import org.springframework.transaction.annotation.Transactional;
 import jakarta.persistence.EntityManager;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.access.AccessDeniedException;
 
 @Service
 public class SeatingService {
@@ -93,7 +94,7 @@ public class SeatingService {
     public PlanView transition(Long planId, SeatingPlan.Status next) {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (next == SeatingPlan.Status.LOCKED && (authentication == null || authentication.getAuthorities().stream().noneMatch(a -> a.getAuthority().equals("ROLE_ADMIN")))) {
-            throw new IllegalArgumentException("Only an Admin can lock the final seating plan.");
+            throw new AccessDeniedException("Only an Admin can lock the final seating plan.");
         }
         SeatingPlan plan = plans.findById(planId).orElseThrow(() -> new IllegalArgumentException("Seating plan not found."));
         plan.transitionTo(next);

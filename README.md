@@ -23,7 +23,7 @@ Each module should own its entities, repositories and service rules. Cross-modul
 1. Sign in to the exam-cell workspace.
 2. Add students and rooms, then create an examination with a room and expected count.
 3. Open the exam's candidate roster and register eligible active students.
-4. Generate a draft seating plan. The Java allocator interleaves branches, walks room rows in a snake pattern, and picks seats that reduce adjacent branch/section penalties. It also creates or refreshes the room's question-paper requirement from the candidate count plus the configured buffer.
+4. Generate a draft seating plan. The Java allocator interleaves branches, walks room rows in a snake pattern, and picks seats that reduce adjacent branch/section penalties. It also creates or refreshes the room's question-paper requirement from the candidate count plus the configured buffer. Candidate registration closes when the plan is generated so the roster cannot silently diverge from the saved seating plan.
 5. Review the room map and score. A faculty member can move a student to an empty usable seat; the score is recalculated and the change is audited.
 6. Advance the plan through `DRAFT → REVIEWED → APPROVED → LOCKED`. Only an Admin can lock; a locked plan cannot be moved or generated again.
 7. Track paper runs through `PREPARING → READY → DISTRIBUTED → COLLECTED`.
@@ -58,7 +58,7 @@ $env:PAPER_BUFFER_COPIES = "2"
 mvn spring-boot:run
 ```
 
-Open <http://localhost:8080>. The default local profile uses an in-memory H2 database and applies the initial Flyway migration with demo data at startup. On an empty database the app creates the first Admin from `SEAT_ADMIN_USERNAME` and `SEAT_ADMIN_PASSWORD`; the local-only fallback is `operator` / `change-this-local-password`.
+Open <http://localhost:8080>. With no environment overrides, the verified local sign-in is `operator` / `change-this-local-password`. The default local profile uses an in-memory H2 database and applies the initial Flyway migration with demo data at startup. On an empty database the app creates the first Admin from `SEAT_ADMIN_USERNAME` and `SEAT_ADMIN_PASSWORD`. If you used the commands above, sign in with the exact password you assigned there (`choose-a-local-password` in the example). Bootstrap credentials are used only when the account table is empty; changing environment variables does not change an existing account. Stopping and restarting the local app resets its in-memory accounts. The MySQL profile persists accounts and password recovery is not implemented yet.
 
 For MySQL, create an empty database and set the standard Spring datasource environment variables:
 
