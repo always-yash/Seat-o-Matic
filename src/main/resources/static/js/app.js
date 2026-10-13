@@ -183,6 +183,10 @@
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
+    if (page === 'team' && new TextEncoder().encode(payload.password || '').length > 72) {
+      document.getElementById('form-error').textContent = 'Passwords cannot exceed 72 UTF-8 bytes.';
+      return;
+    }
     ['semester', 'rows', 'columns', 'capacity', 'expectedStudents', 'roomId'].forEach((key) => {
       if (key in payload && payload[key] !== '') payload[key] = Number(payload[key]);
     });
