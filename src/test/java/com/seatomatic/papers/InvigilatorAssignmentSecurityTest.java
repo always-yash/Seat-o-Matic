@@ -49,6 +49,9 @@ class InvigilatorAssignmentSecurityTest {
     @Autowired
     private SeatingPlanRepository seatingPlanRepository;
 
+    @Autowired
+    private PaperRunRepository paperRunRepository;
+
     private Exam exam1;
     private Exam exam2;
     private Room room1;
@@ -57,6 +60,8 @@ class InvigilatorAssignmentSecurityTest {
     private InvigilatorAssignmentService.AssignmentView assignment1;
     private SeatingPlan plan1;
     private SeatingPlan plan2;
+    private PaperRun run1;
+    private PaperRun run2;
 
     @BeforeEach
     void setUp() {
@@ -74,6 +79,9 @@ class InvigilatorAssignmentSecurityTest {
 
         plan1 = seatingPlanRepository.save(new SeatingPlan(exam1));
         plan2 = seatingPlanRepository.save(new SeatingPlan(exam2));
+
+        run1 = paperRunRepository.save(new PaperRun(exam1, room1, "SET-A", 20, 2));
+        run2 = paperRunRepository.save(new PaperRun(exam2, room2, "SET-A", 20, 2));
     }
 
     @Test
@@ -181,5 +189,52 @@ class InvigilatorAssignmentSecurityTest {
     void invigilator_CannotViewUnassignedExamPlan_Returns403() throws Exception {
         mockMvc.perform(get("/workspace/plans/" + plan2.getId()))
                 .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "assigned.invigilator", roles = {"INVIGILATOR"})
+    void invigilator_CanPerformWorkflowActions_ForAssignedRoom_Success() throws Exception {
+        // Step 1: Confirm Ready
+        mockMvc.perform(post("/api/v1/papers/" + run1.getId() + "/transition")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"READY\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("READY"));
+
+        // Step 2: Mark Distributed
+        mockMvc.perform(post("/api/v1/papers/" + run1.getId() + "/transition")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"DISTRIBUTED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("DISTRIBUTED"));
+
+        // Step 3: Confirm Collection / Reconciliation
+        mockMvc.perform(post("/api/v1/papers/" + run1.getId() + "/transition")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"COLLECTED\"}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.status").value("COLLECTED"));
+    }
+
+    @Test
+    @WithMockUser(username = "assigned.invigilator", roles = {"INVIGILATOR"})
+    void invigilator_CannotPerformWorkflowAction_ForUnassignedRoom_Returns403() throws Exception {
+        mockMvc.perform(post("/api/v1/papers/" + run2.getId() + "/transition")
+                        .with(csrf())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"status\": \"READY\"}"))
+                .andExpect(status().isForbidden());
+    }
+
+    @Test
+    @WithMockUser(username = "faculty", roles = {"FACULTY"})
+    void faculty_CanViewExaminationsPage_DisplaysAssignedInvigilatorAndStatus() throws Exception {
+        mockMvc.perform(get("/workspace/exams"))
+                .andExpect(status().isOk())
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("assigned.invigilator")))
+                .andExpect(org.springframework.test.web.servlet.result.MockMvcResultMatchers.content().string(org.hamcrest.Matchers.containsString("Unassigned")));
     }
 }
