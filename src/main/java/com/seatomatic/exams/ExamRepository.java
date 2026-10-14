@@ -5,4 +5,5 @@ import java.util.List;
 
 public interface ExamRepository extends JpaRepository<Exam, Long> {
     List<Exam> findTop5ByOrderByStartsAtAsc();
+    List<Exam> findAllByOrderByStartsAtAsc();
 }
