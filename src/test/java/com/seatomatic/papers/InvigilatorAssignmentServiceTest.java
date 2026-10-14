@@ -157,4 +157,13 @@ class InvigilatorAssignmentServiceTest {
         assertFalse(exam2Coverage.assigned());
         assertNull(exam2Coverage.invigilatorUsername());
     }
+
+    @Test
+    void isInvigilatorAssignedToExamAndRoom_ValidatesAccurately() {
+        assignmentService.assign(exam1.getId(), room1.getId(), invigilator1.getId());
+        assertTrue(assignmentService.isInvigilatorAssignedToExamAndRoom("invig.active1", exam1.getId(), room1.getId()));
+        assertFalse(assignmentService.isInvigilatorAssignedToExamAndRoom("invig.active1", exam2.getId(), room2.getId()));
+        assertFalse(assignmentService.isInvigilatorAssignedToExamAndRoom("invig.active2", exam1.getId(), room1.getId()));
+        assertFalse(assignmentService.isInvigilatorAssignedToExamAndRoom("nonexistent", exam1.getId(), room1.getId()));
+    }
 }
