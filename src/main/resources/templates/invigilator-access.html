@@ -4,23 +4,98 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="_csrf" th:content="${_csrf.token}">
-  <title>Access setup · Seat-o-Matic</title>
+  <title>Invigilator Desk · Seat-o-Matic</title>
   <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <link rel="stylesheet" th:href="@{/css/app.css}">
 </head>
-<body>
+<body data-page="invigilator-desk">
 <div class="app-shell">
   <div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div>
   <main class="main-content">
-    <header class="topbar"><div class="breadcrumb"><span>Workspace</span><b>/</b><strong>Access setup</strong></div></header>
+    <header class="topbar">
+      <div class="breadcrumb"><span>Workspace</span><b>/</b><strong>Invigilator desk</strong></div>
+      <div class="topbar-actions"><span class="live-indicator"><i></i> Invigilator duty</span></div>
+    </header>
     <section class="page-wrap workspace-page">
-      <div class="eyebrow"><span class="eyebrow-line"></span> INVIGILATOR ACCESS</div>
-      <h1>Your room assignment is not ready yet.</h1>
-      <p class="subheading">Room assignments and invigilator handovers are not active yet. Ask your exam-cell Admin for instructions.</p>
-      <div class="workspace-callout"><span class="callout-icon">i</span><div><strong>Ask your exam-cell Admin to set up room assignments.</strong><p>Your account is active. Assignment-based access will be available after that workflow is implemented.</p></div></div>
-      <form th:action="@{/logout}" method="post"><button class="button button-quiet" type="submit">Sign out</button></form>
+      <div class="welcome-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-line"></span> INVIGILATOR DESK</div>
+          <h1 th:text="'Welcome, ' + ${currentUsername}">Welcome, Invigilator</h1>
+          <p class="subheading">Your assigned examination rooms and exam-day seating plans.</p>
+        </div>
+      </div>
+
+      <div th:if="${not #lists.isEmpty(assignments)}">
+        <div class="workspace-callout">
+          <span class="callout-icon">✳</span>
+          <div>
+            <strong>You have active examination duty assignments.</strong>
+            <p>Review your assigned examination room, capacity, and candidate seating layout before session commencement.</p>
+          </div>
+        </div>
+
+        <article class="panel data-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="eyebrow small-eyebrow">DUTY ROSTER</div>
+              <h3>Assigned examination rooms <span class="count-bubble" th:text="${#lists.size(assignments)}">0</span></h3>
+            </div>
+            <span class="panel-caption">Assigned by exam-cell Admin</span>
+          </div>
+          <div class="table-wrap">
+            <table class="wide-table">
+              <thead>
+                <tr>
+                  <th>EXAMINATION</th>
+                  <th>ROOM</th>
+                  <th>BUILDING</th>
+                  <th>CAPACITY</th>
+                  <th>DATE &amp; TIME</th>
+                  <th>PLAN STATUS</th>
+                  <th>SEATING PLAN</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr th:each="assignment : ${assignments}">
+                  <td>
+                    <strong th:text="${assignment.examName}">Distributed systems</strong>
+                    <small class="table-subline" th:text="${assignment.examCode + ' · ' + assignment.examSubject}">CS-501 · Subject</small>
+                  </td>
+                  <td><strong th:text="${assignment.roomName}">A-204</strong></td>
+                  <td th:text="${assignment.roomBuilding}">Academic block</td>
+                  <td th:text="${assignment.roomCapacity} + ' seats'">46 seats</td>
+                  <td class="date-cell" th:text="${#strings.replace(#strings.substring(assignment.examStartsAt,0,16),'T',' · ')}">2026-10-14 · 09:00</td>
+                  <td>
+                    <span class="status-pill" th:classappend="${#strings.toLowerCase(assignment.planStatus)}" th:text="${assignment.planStatus}">READY</span>
+                  </td>
+                  <td>
+                    <a th:if="${assignment.planId != null}" class="row-action primary-row-action" th:href="@{/workspace/plans/{id}(id=${assignment.planId})}">Open seating plan →</a>
+                    <span th:if="${assignment.planId == null}" class="panel-caption">Plan pending</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </article>
+      </div>
+
+      <div th:if="${#lists.isEmpty(assignments)}">
+        <div class="workspace-callout">
+          <span class="callout-icon">ℹ</span>
+          <div>
+            <strong>No examination room assignments yet.</strong>
+            <p>Your invigilator account is active, but you have not been assigned to any upcoming examination rooms yet. Once an Administrator sets up your room assignment, your schedule and room seating plan will appear here.</p>
+          </div>
+        </div>
+      </div>
+
+      <footer class="page-footer">
+        <span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span>
+        <span>Invigilator session workspace</span>
+      </footer>
     </section>
   </main>
 </div>
+<script th:src="@{/js/app.js}"></script>
 </body>
 </html>
