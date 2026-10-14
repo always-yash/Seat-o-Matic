@@ -23,6 +23,7 @@ public class InvigilatorAssignmentService {
     private final RoomRepository rooms;
     private final UserAccountRepository users;
     private final SeatingPlanRepository seatingPlans;
+    private final PaperRunRepository paperRuns;
     private final AuditService audit;
 
     public InvigilatorAssignmentService(InvigilatorAssignmentRepository assignments,
@@ -30,12 +31,14 @@ public class InvigilatorAssignmentService {
                                         RoomRepository rooms,
                                         UserAccountRepository users,
                                         SeatingPlanRepository seatingPlans,
+                                        PaperRunRepository paperRuns,
                                         AuditService audit) {
         this.assignments = assignments;
         this.exams = exams;
         this.rooms = rooms;
         this.users = users;
         this.seatingPlans = seatingPlans;
+        this.paperRuns = paperRuns;
         this.audit = audit;
     }
 
@@ -133,6 +136,7 @@ public class InvigilatorAssignmentService {
             Exam exam = a.getExam();
             Room room = a.getRoom();
             var plan = seatingPlans.findByExamId(exam.getId());
+            var run = paperRuns.findByExamIdAndRoomIdAndSetCode(exam.getId(), room.getId(), "SET-A");
             return new InvigilatorScheduleView(
                     a.getId(),
                     exam.getId(),
@@ -145,7 +149,9 @@ public class InvigilatorAssignmentService {
                     room.getBuilding(),
                     room.getCapacity(),
                     plan.map(SeatingPlan::getId).orElse(null),
-                    plan.map(p -> p.getStatus().name()).orElse("NO_PLAN")
+                    plan.map(p -> p.getStatus().name()).orElse("NO_PLAN"),
+                    run.map(PaperRun::getId).orElse(null),
+                    run.map(r -> r.getStatus().name()).orElse(null)
             );
         }).toList();
     }
@@ -153,6 +159,14 @@ public class InvigilatorAssignmentService {
     @Transactional(readOnly = true)
     public boolean isInvigilatorAssignedToExam(String username, Long examId) {
         return assignments.isInvigilatorAssignedToExam(username, examId);
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isInvigilatorAssignedToExamAndRoom(String username, Long examId, Long roomId) {
+        if (username == null || examId == null || roomId == null) return false;
+        return assignments.findByExamIdAndRoomId(examId, roomId)
+                .map(a -> a.getInvigilator().getUsername().equalsIgnoreCase(username))
+                .orElse(false);
     }
 
     @Transactional(readOnly = true)
@@ -214,6 +228,16 @@ public class InvigilatorAssignmentService {
             String roomBuilding,
             int roomCapacity,
             Long planId,
-            String planStatus
-    ) { }
+            String planStatus,
+            Long paperRunId,
+            String paperRunStatus
+    ) {
+        public InvigilatorScheduleView(
+                Long assignmentId, Long examId, String examCode, String examName, String examSubject,
+                LocalDateTime examStartsAt, Long roomId, String roomName, String roomBuilding,
+                int roomCapacity, Long planId, String planStatus) {
+            this(assignmentId, examId, examCode, examName, examSubject, examStartsAt, roomId, roomName,
+                    roomBuilding, roomCapacity, planId, planStatus, null, null);
+        }
+    }
 }
