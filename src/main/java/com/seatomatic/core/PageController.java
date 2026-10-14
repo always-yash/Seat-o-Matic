@@ -12,6 +12,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.seatomatic.papers.InvigilatorAssignmentService;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,11 +29,14 @@ public class PageController {
     private final AuditService audit;
     private final SeatingService seating;
     private final SeatingPlanRepository plans;
+    private final InvigilatorAssignmentService assignmentService;
 
     public PageController(StudentService students, ExamService exams, PaperRunService paperRuns,
-                          AuditService audit, SeatingService seating, SeatingPlanRepository plans) {
+                          AuditService audit, SeatingService seating, SeatingPlanRepository plans,
+                          InvigilatorAssignmentService assignmentService) {
         this.students = students; this.exams = exams; this.paperRuns = paperRuns;
         this.audit = audit; this.seating = seating; this.plans = plans;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping({"/", "/dashboard"})
@@ -39,6 +44,7 @@ public class PageController {
         if (authentication != null && authentication.getAuthorities().stream()
                 .anyMatch(authority -> authority.getAuthority().equals("ROLE_INVIGILATOR"))) {
             model.addAttribute("page", "overview");
+            model.addAttribute("assignments", assignmentService.findForInvigilator(authentication.getName()));
             return "invigilator-access";
         }
         model.addAttribute("studentCount", students.count());
@@ -61,10 +67,21 @@ public class PageController {
     public String login() { return "login"; }
 
     @GetMapping("/workspace/plans/{id}")
-    @PreAuthorize("hasAnyRole('ADMIN','FACULTY')")
-    public String seatingPlan(@PathVariable Long id, Model model) {
+    @PreAuthorize("hasAnyRole('ADMIN','FACULTY','INVIGILATOR')")
+    public String seatingPlan(@PathVariable Long id, Model model, Authentication authentication) {
         PlanView plan = seating.find(id);
+        if (authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals("ROLE_INVIGILATOR"))) {
+            if (!assignmentService.isInvigilatorAssignedToExam(authentication.getName(), plan.examId())) {
+                throw new AccessDeniedException("You are not assigned to this examination's seating plan.");
+            }
+        }
         model.addAttribute("plan", plan);
+        var exam = exams.findExam(plan.examId());
+        if (exam.getRoom() != null) {
+            var assignedInvig = assignmentService.findByExamAndRoom(plan.examId(), exam.getRoom().getId());
+            model.addAttribute("assignedInvigilator", assignedInvig.map(a -> a.getInvigilator().getUsername()).orElse(null));
+        }
         Map<String, PlanView.SeatView> occupied = new HashMap<>();
         plan.assignments().forEach(seat -> occupied.put(seat.row() + ":" + seat.column(), seat));
         List<SeatCell> cells = new ArrayList<>();
