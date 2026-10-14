@@ -19,6 +19,7 @@ public class PaperRunService {
     }
     @Transactional(readOnly = true) public List<PaperRun> findAll() { return runs.findAll(); }
     @Transactional(readOnly = true) public long count() { return runs.count(); }
+    @Transactional(readOnly = true) public java.util.Optional<PaperRun> findById(Long id) { return runs.findById(id); }
     @Transactional public PaperRun prepareRequirement(Exam exam, Room room, int candidates) {
         var existing = runs.findByExamIdAndRoomIdAndSetCode(exam.getId(), room.getId(), "SET-A");
         if (existing.isPresent()) {
