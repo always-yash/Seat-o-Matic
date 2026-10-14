@@ -9,4 +9,5 @@ public interface UserAccountRepository extends JpaRepository<UserAccount, Long> 
     boolean existsByUsernameIgnoreCase(String username);
     long countByRoleAndActiveTrue(UserAccount.Role role);
     List<UserAccount> findAllByOrderByUsernameAsc();
+    List<UserAccount> findByRoleAndActiveTrueOrderByUsernameAsc(UserAccount.Role role);
 }
