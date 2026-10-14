@@ -27,13 +27,14 @@
           <p class="subheading" th:if="${plan == null}"><span th:text="${room.building}">Academic block</span> · <span th:text="${room.capacity} + ' usable seats'">46 usable seats</span> · <span th:text="${room.rows + ' × ' + room.columns} + ' grid'">6 × 8 grid</span></p>
         </div>
         <div class="plan-actions" th:if="${plan != null}">
-          <button th:if="${plan.status.name() != 'LOCKED'}" class="button button-quiet regenerate-plan">Regenerate plan <span>↻</span></button>
+          <button th:if="${plan.status.name() != 'LOCKED' and !isInvigilator}" class="button button-quiet regenerate-plan">Regenerate plan <span>↻</span></button>
           <span class="status-pill plan-status" th:classappend="${#strings.toLowerCase(plan.status.name())}" th:text="${plan.status}">DRAFT</span>
-          <button th:if="${plan.status.name() == 'DRAFT'}" class="button button-primary plan-transition" data-next="REVIEWED">Mark reviewed <span>→</span></button>
-          <button th:if="${plan.status.name() == 'REVIEWED'}" class="button button-primary plan-transition" data-next="APPROVED">Approve plan <span>→</span></button>
+          <button th:if="${plan.status.name() == 'DRAFT' and !isInvigilator}" class="button button-primary plan-transition" data-next="REVIEWED">Mark reviewed <span>→</span></button>
+          <button th:if="${plan.status.name() == 'REVIEWED' and !isInvigilator}" class="button button-primary plan-transition" data-next="APPROVED">Approve plan <span>→</span></button>
           <button th:if="${plan.status.name() == 'APPROVED' and isAdmin}" class="button button-primary plan-transition" data-next="LOCKED">Lock for exam day <span>→</span></button>
-          <span th:if="${plan.status.name() == 'APPROVED' and !isAdmin}" class="locked-label">Awaiting Admin lock</span>
-          <span th:if="${plan.status.name() == 'LOCKED'}" class="locked-label">✓ Locked for exam day</span>
+          <span th:if="${plan.status.name() == 'APPROVED' and !isAdmin and !isInvigilator}" class="locked-label">Awaiting Admin lock</span>
+          <span th:if="${isInvigilator}" class="locked-label">👁 Invigilator view (read-only)</span>
+          <span th:if="${plan.status.name() == 'LOCKED' and !isInvigilator}" class="locked-label">✓ Locked for exam day</span>
         </div>
         <div class="plan-actions" th:if="${plan == null}">
           <span class="status-pill ready">AVAILABLE</span>
@@ -53,9 +54,9 @@
               <span><i class="legend-blocked"></i> Outside capacity</span>
             </div>
           </div>
-          <div class="front-of-room">FRONT OF ROOM <span>BOARD / INVIGILATOR DESK</span></div>
+          <div class="front-of-room">FRONT OF ROOM <span>BOARD / INVIGILATOR DESK<span th:if="${assignedInvigilator != null}" th:text="' · ' + ${assignedInvigilator}"></span></span></div>
           <div class="seat-map" th:style="|grid-template-columns: repeat(${plan != null ? plan.columns : room.columns}, minmax(42px, 1fr))|">
-            <button type="button" class="seat-cell" th:each="cell : ${cells}" th:classappend="${!cell.usable} ? ' seat-unusable' : (${cell.assignment != null} ? ' seat-occupied' : ' seat-empty')" th:attr="data-row=${cell.row},data-column=${cell.column},data-assignment-id=${cell.assignment != null ? cell.assignment.assignmentId : ''},title=${cell.assignment != null ? cell.assignment.studentName + ' · ' + cell.assignment.branch : (cell.usable ? 'Available seat' : 'Outside capacity')}" th:disabled="${!cell.usable or (plan != null and plan.status.name() == 'LOCKED') or plan == null}">
+            <button type="button" class="seat-cell" th:each="cell : ${cells}" th:classappend="${!cell.usable} ? ' seat-unusable' : (${cell.assignment != null} ? ' seat-occupied' : ' seat-empty')" th:attr="data-row=${cell.row},data-column=${cell.column},data-assignment-id=${cell.assignment != null ? cell.assignment.assignmentId : ''},title=${cell.assignment != null ? cell.assignment.studentName + ' · ' + cell.assignment.branch : (cell.usable ? 'Available seat' : 'Outside capacity')}" th:disabled="${!cell.usable or (plan != null and plan.status.name() == 'LOCKED') or plan == null or isInvigilator}">
               <span class="seat-number" th:text="${'R' + cell.row + '·' + cell.column}">R1·1</span>
               <strong th:if="${cell.assignment != null}" th:text="${#strings.substring(cell.assignment.studentName,0,1)}">A</strong>
               <small th:if="${cell.assignment != null}" th:text="${cell.assignment.studentId}">24E1CS001</small>
@@ -63,8 +64,9 @@
               <span th:if="${!cell.usable}" class="blocked-mark">—</span>
             </button>
           </div>
-          <div class="map-instructions" th:if="${plan != null and plan.status.name() != 'LOCKED'}"><span class="instruction-icon">↔</span> Move a student: select an assigned seat, then select an empty seat.</div>
-          <div class="map-instructions locked-note" th:if="${plan != null and plan.status.name() == 'LOCKED'}">This seating plan is locked. No more seat changes are allowed.</div>
+          <div class="map-instructions" th:if="${isInvigilator}"><span class="instruction-icon">ℹ</span> Read-only seating layout for your assigned examination room.</div>
+          <div class="map-instructions" th:if="${!isInvigilator and plan != null and plan.status.name() != 'LOCKED'}"><span class="instruction-icon">↔</span> Move a student: select an assigned seat, then select an empty seat.</div>
+          <div class="map-instructions locked-note" th:if="${!isInvigilator and plan != null and plan.status.name() == 'LOCKED'}">This seating plan is locked. No more seat changes are allowed.</div>
           <div class="map-instructions" th:if="${plan == null}"><span class="instruction-icon">ℹ</span> Seating layout grid for this room based on configured rows, columns, and capacity.</div>
         </article>
         <aside class="plan-side" th:if="${plan != null}">
