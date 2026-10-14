@@ -10,6 +10,7 @@ import org.springframework.security.core.Authentication;
 import com.seatomatic.core.UserAccountService;
 import java.util.HashMap;
 import java.util.Map;
+import com.seatomatic.papers.InvigilatorAssignmentService;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -23,15 +24,18 @@ public class WorkspaceController {
     private final AuditService audit;
     private final SeatingPlanRepository plans;
     private final UserAccountService userAccounts;
+    private final InvigilatorAssignmentService assignmentService;
 
     public WorkspaceController(StudentService students, ExamService exams, PaperRunService papers,
-            AuditService audit, SeatingPlanRepository plans, UserAccountService userAccounts) {
+            AuditService audit, SeatingPlanRepository plans, UserAccountService userAccounts,
+            InvigilatorAssignmentService assignmentService) {
         this.students = students;
         this.exams = exams;
         this.papers = papers;
         this.audit = audit;
         this.plans = plans;
         this.userAccounts = userAccounts;
+        this.assignmentService = assignmentService;
     }
 
     @GetMapping("/workspace/{section}")
@@ -54,10 +58,22 @@ public class WorkspaceController {
                 records.forEach(exam -> plans.findByExamId(exam.getId())
                         .ifPresent(plan -> planIds.put(exam.getId(), plan.getId())));
                 model.addAttribute("planIds", planIds);
+                Map<Long, String> invigilatorMap = new HashMap<>();
+                assignmentService.listCoverage().forEach(c -> {
+                    if (c.assigned()) invigilatorMap.put(c.examId(), c.invigilatorUsername());
+                });
+                model.addAttribute("invigilatorMap", invigilatorMap);
             }
             case "rooms" -> model.addAttribute("records", exams.findRooms());
             case "papers" -> model.addAttribute("records", papers.findAll());
-            case "team" -> model.addAttribute("records", userAccounts.list());
+            case "team" -> {
+                var accounts = userAccounts.list();
+                model.addAttribute("records", accounts);
+                model.addAttribute("accounts", accounts);
+                model.addAttribute("assignments", assignmentService.listCoverage());
+                model.addAttribute("invigilators", accounts.stream()
+                        .filter(a -> a.active() && a.role() == UserAccount.Role.INVIGILATOR).toList());
+            }
             case "analytics" -> {
                 model.addAttribute("studentCount", students.count());
                 model.addAttribute("examCount", exams.countExams());
@@ -73,7 +89,11 @@ public class WorkspaceController {
     @PreAuthorize("hasRole('ADMIN')")
     public String team(Model model) {
         model.addAttribute("page", "team");
-        model.addAttribute("accounts", userAccounts.list());
+        var accounts = userAccounts.list();
+        model.addAttribute("accounts", accounts);
+        model.addAttribute("assignments", assignmentService.listCoverage());
+        model.addAttribute("invigilators", accounts.stream()
+                .filter(a -> a.active() && a.role() == UserAccount.Role.INVIGILATOR).toList());
         return "team";
     }
 
