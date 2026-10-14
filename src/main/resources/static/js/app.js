@@ -238,4 +238,90 @@
       button.disabled = false;
     }
   }));
+
+  const assignDialog = document.querySelector('#assign-dialog');
+  const assignForm = document.querySelector('#assign-form');
+  if (assignDialog && assignForm) {
+    document.querySelectorAll('.open-assign-dialog').forEach((button) => {
+      button.addEventListener('click', () => {
+        document.querySelector('#assign-exam-id').value = button.dataset.examId || '';
+        document.querySelector('#assign-room-id').value = button.dataset.roomId || '';
+        document.querySelector('#assign-exam-label').textContent = button.dataset.examCode || '';
+        document.querySelector('#assign-room-label').textContent = button.dataset.roomName || '';
+        document.querySelector('#assign-dialog-title').textContent = button.dataset.currentUserId ? 'Reassign Invigilator' : 'Assign Invigilator';
+        const select = document.querySelector('#assign-user-select');
+        if (select) {
+          select.value = button.dataset.currentUserId || '';
+        }
+        document.querySelector('#assign-form-error').textContent = '';
+        assignDialog.showModal();
+      });
+    });
+
+    assignDialog.querySelectorAll('.dialog-close, .button-quiet').forEach((button) => {
+      button.addEventListener('click', (e) => {
+        e.preventDefault();
+        assignDialog.close();
+      });
+    });
+
+    assignForm.addEventListener('submit', async (event) => {
+      if (event.submitter && (event.submitter.value === 'cancel' || event.submitter.classList.contains('dialog-close') || event.submitter.classList.contains('button-quiet'))) {
+        event.preventDefault();
+        assignDialog.close();
+        return;
+      }
+      event.preventDefault();
+      const examId = Number(document.querySelector('#assign-exam-id').value);
+      const roomId = Number(document.querySelector('#assign-room-id').value);
+      const userId = Number(document.querySelector('#assign-user-select').value);
+      const errorElem = document.querySelector('#assign-form-error');
+      if (!userId) {
+        errorElem.textContent = 'Please choose an invigilator.';
+        return;
+      }
+      const saveBtn = document.querySelector('#save-assignment-btn');
+      if (saveBtn) saveBtn.disabled = true;
+      try {
+        const response = await fetch('/api/v1/invigilator-assignments', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'X-CSRF-TOKEN': csrf },
+          body: JSON.stringify({ examId, roomId, userId })
+        });
+        if (!response.ok) {
+          const body = await response.json().catch(() => ({}));
+          throw new Error(body.detail || body.message || 'Could not save this invigilator assignment.');
+        }
+        assignDialog.close();
+        window.location.reload();
+      } catch (error) {
+        errorElem.textContent = error.message;
+        if (saveBtn) saveBtn.disabled = false;
+      }
+    });
+
+    document.querySelectorAll('.remove-assignment').forEach((button) => {
+      button.addEventListener('click', async () => {
+        if (!window.confirm('Remove this invigilator assignment?')) return;
+        button.disabled = true;
+        try {
+          const response = await fetch(`/api/v1/invigilator-assignments/${button.dataset.assignmentId}`, {
+            method: 'DELETE',
+            headers: { 'X-CSRF-TOKEN': csrf }
+          });
+          if (!response.ok) {
+            const body = await response.json().catch(() => ({}));
+            throw new Error(body.detail || body.message || 'Could not remove this invigilator assignment.');
+          }
+          window.location.reload();
+        } catch (error) {
+          const msg = document.querySelector('#assignment-message');
+          if (msg) msg.textContent = error.message;
+          else window.alert(error.message);
+          button.disabled = false;
+        }
+      });
+    });
+  }
 })();
+
