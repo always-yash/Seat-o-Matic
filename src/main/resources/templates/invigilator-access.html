@@ -53,6 +53,7 @@
                   <th>DATE &amp; TIME</th>
                   <th>PLAN STATUS</th>
                   <th>SEATING PLAN</th>
+                  <th>PAPER WORKFLOW</th>
                 </tr>
               </thead>
               <tbody>
@@ -71,6 +72,15 @@
                   <td>
                     <a th:if="${assignment.planId != null}" class="row-action primary-row-action" th:href="@{/workspace/plans/{id}(id=${assignment.planId})}">Open seating plan →</a>
                     <span th:if="${assignment.planId == null}" class="panel-caption">Plan pending</span>
+                  </td>
+                  <td>
+                    <div th:if="${assignment.paperRunId != null}">
+                      <button th:if="${assignment.paperRunStatus == 'PREPARING'}" class="row-action primary-row-action paper-transition" th:attr="data-run-id=${assignment.paperRunId}" data-next="READY">Confirm ready →</button>
+                      <button th:if="${assignment.paperRunStatus == 'READY'}" class="row-action primary-row-action paper-transition" th:attr="data-run-id=${assignment.paperRunId}" data-next="DISTRIBUTED">Mark distributed →</button>
+                      <button th:if="${assignment.paperRunStatus == 'DISTRIBUTED'}" class="row-action primary-row-action paper-transition" th:attr="data-run-id=${assignment.paperRunId}" data-next="COLLECTED">Confirm collection →</button>
+                      <span th:if="${assignment.paperRunStatus == 'COLLECTED'}" class="panel-caption"><span class="status-pill ready">Reconciled</span></span>
+                    </div>
+                    <span th:if="${assignment.paperRunId == null}" class="panel-caption">Paper run pending</span>
                   </td>
                 </tr>
               </tbody>
