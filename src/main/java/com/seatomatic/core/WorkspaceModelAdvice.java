@@ -11,6 +11,8 @@ public class WorkspaceModelAdvice {
     public boolean isAdmin(Authentication authentication) { return hasRole(authentication, "ROLE_ADMIN"); }
     @ModelAttribute("isFaculty")
     public boolean isFaculty(Authentication authentication) { return hasRole(authentication, "ROLE_FACULTY"); }
+    @ModelAttribute("isInvigilator")
+    public boolean isInvigilator(Authentication authentication) { return hasRole(authentication, "ROLE_INVIGILATOR"); }
     @ModelAttribute("currentUsername")
     public String currentUsername(Authentication authentication) { return authentication == null ? "" : authentication.getName(); }
     @ModelAttribute("currentRole")
