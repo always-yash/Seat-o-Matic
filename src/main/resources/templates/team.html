@@ -1,2 +1,217 @@
-<!doctype html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="_csrf" th:content="${_csrf.token}"><title>Team access · Seat-o-Matic</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" th:href="@{/css/app.css}"></head><body data-page="team"><div class="app-shell"><div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div><main class="main-content"><header class="topbar"><div class="breadcrumb"><span>Workspace</span><b>/</b><strong>Team access</strong></div><div class="topbar-actions"><span class="live-indicator"><i></i> Admin controls</span></div></header><section class="page-wrap workspace-page"><div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> ACCESS CONTROL</div><h1>People behind the plan</h1><p class="subheading">Give each teammate the access their exam-day role needs.</p></div><button class="button button-primary" id="open-create"><span>＋</span> Add teammate</button></div><div class="workspace-callout"><span class="callout-icon">♧</span><div><strong>Three roles. Clear responsibilities.</strong><p>Admins manage accounts and lock plans. Faculty prepare sessions and seating. Invigilator accounts are reserved; assignment-based handover access is not active yet.</p></div></div><article class="panel data-panel"><div class="panel-heading"><div><div class="eyebrow small-eyebrow">TEAM DIRECTORY</div><h3>Accounts <span class="count-bubble" th:text="${#lists.size(accounts)}">0</span></h3></div><span class="panel-caption">Password hashes never appear here</span></div><div class="table-wrap"><table class="wide-table"><thead><tr><th>USERNAME</th><th>ROLE</th><th>STATUS</th><th>CREATED</th><th>ACCESS</th></tr></thead><tbody><tr th:each="account : ${accounts}"><td><span class="person-avatar" th:text="${#strings.substring(account.username,0,1)}">E</span><strong th:text="${account.username}">exam-cell</strong></td><td><span class="role-badge" th:classappend="${#strings.toLowerCase(account.role.name())}" th:text="${account.role}">ADMIN</span></td><td><span class="status-pill" th:classappend="${account.active ? 'ready' : 'preparing'}" th:text="${account.active ? 'ACTIVE' : 'PAUSED'}">ACTIVE</span></td><td class="date-cell" th:text="${#strings.substring(account.createdAt,0,16)}">2026-10-13</td><td><button th:if="${account.active}" class="row-action user-toggle" th:attr="data-user-id=${account.id}" data-active="false">Pause access</button><button th:unless="${account.active}" class="row-action primary-row-action user-toggle" th:attr="data-user-id=${account.id}" data-active="true">Restore access</button></td></tr><tr th:if="${#lists.isEmpty(accounts)}"><td colspan="5" class="empty-state">No accounts exist yet.</td></tr></tbody></table></div><p class="form-error team-message" id="team-message" role="status"></p></article><footer class="page-footer"><span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span><span>Only Admins can manage account access.</span></footer></section></main></div>
-<dialog class="create-dialog" id="create-dialog"><form id="create-form" method="dialog"><div class="dialog-head"><div><div class="eyebrow small-eyebrow">NEW ACCOUNT</div><h2 id="dialog-title">Invite a teammate</h2></div><button class="dialog-close" value="cancel" aria-label="Close">×</button></div><div id="user-fields" class="form-fields"><label>Username<input name="username" required minlength="3" maxlength="60" pattern="[A-Za-z0-9._-]+" title="Use letters, numbers, periods, underscores or hyphens" placeholder="first.last" autocomplete="off"></label><label>Temporary password<input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password" placeholder="At least 12 characters"></label><label>Role<select name="role" required><option value="">Choose a role</option><option value="FACULTY">Faculty · plan sessions</option><option value="INVIGILATOR">Invigilator · assignments not enabled yet</option><option value="ADMIN">Admin · manage the workspace</option></select></label></div><p class="form-error" id="form-error" role="alert"></p><div class="dialog-actions"><button class="button button-quiet" value="cancel">Cancel</button><button class="button button-primary" type="submit">Create account <span>→</span></button></div></form></dialog><script th:src="@{/js/app.js}"></script></body></html>
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <title>Team access · Seat-o-Matic</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body data-page="team">
+<div class="app-shell">
+  <div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div>
+  <main class="main-content">
+    <header class="topbar">
+      <div class="breadcrumb"><span>Workspace</span><b>/</b><strong>Team access</strong></div>
+      <div class="topbar-actions"><span class="live-indicator"><i></i> Admin controls</span></div>
+    </header>
+    <section class="page-wrap workspace-page">
+      <div class="welcome-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-line"></span> ACCESS CONTROL</div>
+          <h1>People behind the plan</h1>
+          <p class="subheading">Give each teammate the access their exam-day role needs.</p>
+        </div>
+        <button class="button button-primary" id="open-create"><span>＋</span> Add teammate</button>
+      </div>
+
+      <div class="workspace-callout">
+        <span class="callout-icon">♧</span>
+        <div>
+          <strong>Three roles. Clear responsibilities.</strong>
+          <p>Admins manage accounts, lock plans, and assign room invigilators. Faculty prepare sessions and seating. Invigilators access their assigned exam rooms and seating layouts.</p>
+        </div>
+      </div>
+
+      <article class="panel data-panel">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow small-eyebrow">TEAM DIRECTORY</div>
+            <h3>Accounts <span class="count-bubble" th:text="${#lists.size(accounts)}">0</span></h3>
+          </div>
+          <span class="panel-caption">Password hashes never appear here</span>
+        </div>
+        <div class="table-wrap">
+          <table class="wide-table">
+            <thead>
+              <tr>
+                <th>USERNAME</th>
+                <th>ROLE</th>
+                <th>STATUS</th>
+                <th>CREATED</th>
+                <th>ACCESS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="account : ${accounts}">
+                <td>
+                  <span class="person-avatar" th:text="${#strings.substring(account.username,0,1)}">E</span>
+                  <strong th:text="${account.username}">exam-cell</strong>
+                </td>
+                <td>
+                  <span class="role-badge" th:classappend="${#strings.toLowerCase(account.role.name())}" th:text="${account.role}">ADMIN</span>
+                </td>
+                <td>
+                  <span class="status-pill" th:classappend="${account.active ? 'ready' : 'preparing'}" th:text="${account.active ? 'ACTIVE' : 'PAUSED'}">ACTIVE</span>
+                </td>
+                <td class="date-cell" th:text="${#strings.substring(account.createdAt,0,16)}">2026-10-13</td>
+                <td>
+                  <button th:if="${account.active}" class="row-action user-toggle" th:attr="data-user-id=${account.id}" data-active="false">Pause access</button>
+                  <button th:unless="${account.active}" class="row-action primary-row-action user-toggle" th:attr="data-user-id=${account.id}" data-active="true">Restore access</button>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(accounts)}">
+                <td colspan="5" class="empty-state">No accounts exist yet.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="form-error team-message" id="team-message" role="status"></p>
+      </article>
+
+      <article class="panel data-panel" style="margin-top: 24px;">
+        <div class="panel-heading">
+          <div>
+            <div class="eyebrow small-eyebrow">DUTY ROSTER</div>
+            <h3>Invigilator assignments <span class="count-bubble" th:text="${#lists.size(assignments)}">0</span></h3>
+          </div>
+          <span class="panel-caption">Only Admins can assign or remove invigilators</span>
+        </div>
+        <div class="table-wrap">
+          <table class="wide-table">
+            <thead>
+              <tr>
+                <th>EXAMINATION</th>
+                <th>ROOM</th>
+                <th>DATE &amp; TIME</th>
+                <th>ASSIGNED INVIGILATOR</th>
+                <th>STATUS</th>
+                <th>ACTIONS</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr th:each="assignment : ${assignments}">
+                <td>
+                  <strong th:text="${assignment.examName}">Distributed systems</strong>
+                  <small class="table-subline" th:text="${assignment.examCode}">CS-501</small>
+                </td>
+                <td>
+                  <strong th:text="${assignment.roomName}">A-204</strong>
+                  <small class="table-subline" th:text="${assignment.roomBuilding}">Academic block</small>
+                </td>
+                <td class="date-cell" th:text="${#strings.replace(#strings.substring(assignment.examStartsAt,0,16),'T',' · ')}">2026-10-14 · 09:00</td>
+                <td>
+                  <span th:if="${assignment.assigned}">
+                    <span class="person-avatar" th:text="${#strings.substring(assignment.invigilatorUsername,0,1)}">I</span>
+                    <strong th:text="${assignment.invigilatorUsername}">invigilator.one</strong>
+                  </span>
+                  <span th:unless="${assignment.assigned}" class="panel-caption">Unassigned</span>
+                </td>
+                <td>
+                  <span class="status-pill" th:classappend="${assignment.assigned ? 'ready' : 'preparing'}" th:text="${assignment.assigned ? 'ASSIGNED' : 'UNASSIGNED'}">ASSIGNED</span>
+                </td>
+                <td>
+                  <div class="workflow-actions">
+                    <button th:if="${assignment.assigned}" class="row-action open-assign-dialog" th:attr="data-exam-id=${assignment.examId},data-room-id=${assignment.roomId},data-exam-code=${assignment.examCode},data-room-name=${assignment.roomName},data-current-user-id=${assignment.invigilatorId}">Reassign</button>
+                    <button th:if="${assignment.assigned}" class="row-action remove-assignment" th:attr="data-assignment-id=${assignment.assignmentId}">Remove</button>
+                    <button th:unless="${assignment.assigned}" class="row-action primary-row-action open-assign-dialog" th:attr="data-exam-id=${assignment.examId},data-room-id=${assignment.roomId},data-exam-code=${assignment.examCode},data-room-name=${assignment.roomName}">Assign</button>
+                  </div>
+                </td>
+              </tr>
+              <tr th:if="${#lists.isEmpty(assignments)}">
+                <td colspan="6" class="empty-state">No examination rooms are currently scheduled.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p class="form-error team-message" id="assignment-message" role="status"></p>
+      </article>
+
+      <footer class="page-footer">
+        <span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span>
+        <span>Only Admins can manage account access and invigilator duties.</span>
+      </footer>
+    </section>
+  </main>
+</div>
+
+<dialog class="create-dialog" id="create-dialog">
+  <form id="create-form" method="dialog">
+    <div class="dialog-head">
+      <div>
+        <div class="eyebrow small-eyebrow">NEW ACCOUNT</div>
+        <h2 id="dialog-title">Invite a teammate</h2>
+      </div>
+      <button type="button" class="dialog-close" value="cancel" aria-label="Close">×</button>
+    </div>
+    <div id="user-fields" class="form-fields">
+      <label>Username
+        <input name="username" required minlength="3" maxlength="60" pattern="[A-Za-z0-9._-]+" title="Use letters, numbers, periods, underscores or hyphens" placeholder="first.last" autocomplete="off">
+      </label>
+      <label>Temporary password
+        <input name="password" type="password" required minlength="12" maxlength="72" autocomplete="new-password" placeholder="At least 12 characters">
+      </label>
+      <label>Role
+        <select name="role" required>
+          <option value="">Choose a role</option>
+          <option value="FACULTY">Faculty · plan sessions</option>
+          <option value="INVIGILATOR">Invigilator · room invigilation duty</option>
+          <option value="ADMIN">Admin · manage the workspace</option>
+        </select>
+      </label>
+    </div>
+    <p class="form-error" id="form-error" role="alert"></p>
+    <div class="dialog-actions">
+      <button type="button" class="button button-quiet" value="cancel">Cancel</button>
+      <button class="button button-primary" type="submit">Create account <span>→</span></button>
+    </div>
+  </form>
+</dialog>
+
+<dialog class="create-dialog" id="assign-dialog">
+  <form id="assign-form" method="dialog">
+    <div class="dialog-head">
+      <div>
+        <div class="eyebrow small-eyebrow">DUTY ALLOCATION</div>
+        <h2 id="assign-dialog-title">Assign Invigilator</h2>
+      </div>
+      <button type="button" class="dialog-close" value="cancel" aria-label="Close">×</button>
+    </div>
+    <div class="form-fields">
+      <input type="hidden" name="examId" id="assign-exam-id">
+      <input type="hidden" name="roomId" id="assign-room-id">
+      <div id="assign-context-info" style="padding: 10px 14px; background: rgba(0,0,0,0.03); border-radius: 6px; font-size: 13px; font-weight: 500;">
+        Exam: <strong id="assign-exam-label">-</strong> · Room: <strong id="assign-room-label">-</strong>
+      </div>
+      <label>Select Invigilator
+        <select name="userId" id="assign-user-select" required>
+          <option value="">Choose an active invigilator</option>
+          <option th:each="invig : ${invigilators}" th:value="${invig.id}" th:text="${invig.username}">invig1</option>
+        </select>
+      </label>
+      <div th:if="${#lists.isEmpty(invigilators)}" class="panel-caption" style="color: #c95c47;">
+        No active invigilator accounts exist. Add an account with the INVIGILATOR role first.
+      </div>
+    </div>
+    <p class="form-error" id="assign-form-error" role="alert"></p>
+    <div class="dialog-actions">
+      <button type="button" class="button button-quiet" value="cancel">Cancel</button>
+      <button class="button button-primary" type="submit" id="save-assignment-btn">Save assignment <span>→</span></button>
+    </div>
+  </form>
+</dialog>
+
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>
