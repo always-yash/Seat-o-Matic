@@ -25,6 +25,7 @@ public class ExamService {
     @Transactional(readOnly = true) public long countExams() { return exams.count(); }
     @Transactional(readOnly = true) public long countRooms() { return rooms.count(); }
     @Transactional(readOnly = true) public List<Room> findRooms() { return rooms.findAll(); }
+    @Transactional(readOnly = true) public Room findRoom(Long id) { return rooms.findById(id).orElseThrow(() -> new IllegalArgumentException("Room not found.")); }
     @Transactional(readOnly = true) public List<Room> findFeaturedRooms() { return rooms.findTop4ByOrderByNameAsc(); }
     @Transactional(readOnly = true) public List<ExamCandidate> findCandidates(Long examId) {
         requireExam(examId); return candidates.findByExamIdOrderByStudentFullName(examId);

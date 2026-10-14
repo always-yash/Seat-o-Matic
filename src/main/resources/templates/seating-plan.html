@@ -1,2 +1,111 @@
-<!doctype html><html lang="en" xmlns:th="http://www.thymeleaf.org"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="_csrf" th:content="${_csrf.token}"><title>Seating plan · Seat-o-Matic</title><link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet"><link rel="stylesheet" th:href="@{/css/app.css}"></head><body data-page="seating-plan" th:attr="data-plan-id=${plan.id},data-plan-status=${plan.status},data-plan-exam-id=${plan.examId}"><div class="app-shell"><div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div><main class="main-content"><header class="topbar"><div class="breadcrumb"><a href="/workspace/exams">Examinations</a><b>/</b><strong>Seating plan</strong></div><div class="topbar-actions"><a th:href="@{/workspace/exams/{id}/candidates(id=${plan.examId})}" class="topbar-home">← Candidate roster</a></div></header><section class="page-wrap workspace-page"><div class="welcome-row"><div><div class="eyebrow"><span class="eyebrow-line"></span> SEATING WORKSPACE · <span th:text="${plan.examCode}">CS-501</span></div><h1 th:text="${plan.examName}">Distributed systems</h1><p class="subheading"><span th:text="${plan.roomName}">A-204</span> · <span th:text="${#lists.size(plan.assignments)} + ' of ' + plan.capacity + ' seats assigned'"></span></p></div><div class="plan-actions"><button th:if="${plan.status.name() != 'LOCKED'}" class="button button-quiet regenerate-plan">Regenerate plan <span>↻</span></button><span class="status-pill plan-status" th:classappend="${#strings.toLowerCase(plan.status.name())}" th:text="${plan.status}">DRAFT</span><button th:if="${plan.status.name() == 'DRAFT'}" class="button button-primary plan-transition" data-next="REVIEWED">Mark reviewed <span>→</span></button><button th:if="${plan.status.name() == 'REVIEWED'}" class="button button-primary plan-transition" data-next="APPROVED">Approve plan <span>→</span></button><button th:if="${plan.status.name() == 'APPROVED' and isAdmin}" class="button button-primary plan-transition" data-next="LOCKED">Lock for exam day <span>→</span></button><span th:if="${plan.status.name() == 'APPROVED' and !isAdmin}" class="locked-label">Awaiting Admin lock</span><span th:if="${plan.status.name() == 'LOCKED'}" class="locked-label">✓ Locked for exam day</span></div></div>
-<div class="plan-alert" id="plan-alert" role="status"></div><section class="plan-layout"><article class="panel map-panel"><div class="panel-heading"><div><div class="eyebrow small-eyebrow">ROOM SEAT MAP</div><h3><span th:text="${plan.roomName}">A-204</span> <span class="count-bubble" th:text="${plan.rows + ' × ' + plan.columns}">6 × 8</span></h3></div><div class="seat-legend"><span><i class="legend-filled"></i> Assigned</span><span><i class="legend-empty"></i> Available</span><span><i class="legend-blocked"></i> Outside capacity</span></div></div><div class="front-of-room">FRONT OF ROOM <span>BOARD / INVIGILATOR DESK</span></div><div class="seat-map" th:style="|grid-template-columns: repeat(${plan.columns}, minmax(42px, 1fr))|"><button type="button" class="seat-cell" th:each="cell : ${cells}" th:classappend="${!cell.usable} ? ' seat-unusable' : (${cell.assignment != null} ? ' seat-occupied' : ' seat-empty')" th:attr="data-row=${cell.row},data-column=${cell.column},data-assignment-id=${cell.assignment != null ? cell.assignment.assignmentId : ''},title=${cell.assignment != null ? cell.assignment.studentName + ' · ' + cell.assignment.branch : 'Empty seat'}" th:disabled="${!cell.usable or plan.status.name() == 'LOCKED'}"><span class="seat-number" th:text="${'R' + cell.row + '·' + cell.column}">R1·1</span><strong th:if="${cell.assignment != null}" th:text="${#strings.substring(cell.assignment.studentName,0,1)}">A</strong><small th:if="${cell.assignment != null}" th:text="${cell.assignment.studentId}">24E1CS001</small><span th:if="${cell.assignment == null and cell.usable}" class="empty-seat-mark">＋</span><span th:if="${!cell.usable}" class="blocked-mark">—</span></button></div><div class="map-instructions" th:if="${plan.status.name() != 'LOCKED'}"><span class="instruction-icon">↔</span> Move a student: select an assigned seat, then select an empty seat.</div><div class="map-instructions locked-note" th:if="${plan.status.name() == 'LOCKED'}">This seating plan is locked. No more seat changes are allowed.</div></article><aside class="plan-side"><article class="panel score-card"><div class="eyebrow small-eyebrow">ARRANGEMENT QUALITY</div><div class="score-value" th:text="${plan.conflictScore}">0</div><div class="score-label">adjacency points</div><div class="score-explainer">Lower is better. Same-branch neighbours add 10 points; same-section neighbours add 2.</div><div class="score-meta"><span>Eligible students</span><strong th:text="${#lists.size(plan.assignments)}">4</strong></div><div class="score-meta"><span>Room capacity</span><strong th:text="${plan.capacity}">46</strong></div><div class="score-meta"><span>Last updated</span><strong th:text="${#strings.substring(plan.updatedAt,0,16)}">2026-10-13</strong></div></article><article class="tip-card plan-tip"><div class="tip-icon">✳</div><span class="tip-overline">REVIEW WITH CARE</span><h3>Automation proposes. You decide.</h3><p>Review the room map and score, adjust open seats, then approve and lock the final arrangement.</p></article></aside></section><footer class="page-footer"><span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span><span>Built for calm, confident exam days.</span></footer></section></main></div><script th:src="@{/js/app.js}"></script></body></html>
+<!doctype html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="_csrf" th:content="${_csrf.token}">
+  <title th:text="${plan != null ? 'Seating plan · Seat-o-Matic' : room.name + ' · Seating layout · Seat-o-Matic'}">Seating plan · Seat-o-Matic</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/app.css}">
+</head>
+<body th:attr="data-page=${plan != null ? 'seating-plan' : 'room-layout'},data-plan-id=${plan != null ? plan.id : ''},data-plan-status=${plan != null ? plan.status : ''},data-plan-exam-id=${plan != null ? plan.examId : ''}">
+<div class="app-shell">
+  <div th:replace="~{fragments/sidebar :: sidebar(${page})}"></div>
+  <main class="main-content">
+    <header class="topbar">
+      <div class="breadcrumb" th:if="${plan != null}"><a href="/workspace/exams">Examinations</a><b>/</b><strong>Seating plan</strong></div>
+      <div class="breadcrumb" th:if="${plan == null}"><a href="/workspace/rooms">Rooms &amp; seats</a><b>/</b><strong th:text="${room.name}">A-204</strong></div>
+      <div class="topbar-actions" th:if="${plan != null}"><a th:href="@{/workspace/exams/{id}/candidates(id=${plan.examId})}" class="topbar-home">← Candidate roster</a></div>
+      <div class="topbar-actions" th:if="${plan == null}"><a href="/workspace/rooms" class="topbar-home">← Rooms &amp; seats</a></div>
+    </header>
+    <section class="page-wrap workspace-page">
+      <div class="welcome-row">
+        <div>
+          <div class="eyebrow"><span class="eyebrow-line"></span> <span th:text="${plan != null ? 'SEATING WORKSPACE · ' + plan.examCode : 'ROOM SEATING LAYOUT · ' + room.name}">SEATING WORKSPACE · CS-501</span></div>
+          <h1 th:text="${plan != null ? plan.examName : room.name}">Distributed systems</h1>
+          <p class="subheading" th:if="${plan != null}"><span th:text="${plan.roomName}">A-204</span> · <span th:text="${#lists.size(plan.assignments)} + ' of ' + plan.capacity + ' seats assigned'"></span></p>
+          <p class="subheading" th:if="${plan == null}"><span th:text="${room.building}">Academic block</span> · <span th:text="${room.capacity} + ' usable seats'">46 usable seats</span> · <span th:text="${room.rows + ' × ' + room.columns} + ' grid'">6 × 8 grid</span></p>
+        </div>
+        <div class="plan-actions" th:if="${plan != null}">
+          <button th:if="${plan.status.name() != 'LOCKED'}" class="button button-quiet regenerate-plan">Regenerate plan <span>↻</span></button>
+          <span class="status-pill plan-status" th:classappend="${#strings.toLowerCase(plan.status.name())}" th:text="${plan.status}">DRAFT</span>
+          <button th:if="${plan.status.name() == 'DRAFT'}" class="button button-primary plan-transition" data-next="REVIEWED">Mark reviewed <span>→</span></button>
+          <button th:if="${plan.status.name() == 'REVIEWED'}" class="button button-primary plan-transition" data-next="APPROVED">Approve plan <span>→</span></button>
+          <button th:if="${plan.status.name() == 'APPROVED' and isAdmin}" class="button button-primary plan-transition" data-next="LOCKED">Lock for exam day <span>→</span></button>
+          <span th:if="${plan.status.name() == 'APPROVED' and !isAdmin}" class="locked-label">Awaiting Admin lock</span>
+          <span th:if="${plan.status.name() == 'LOCKED'}" class="locked-label">✓ Locked for exam day</span>
+        </div>
+        <div class="plan-actions" th:if="${plan == null}">
+          <span class="status-pill ready">AVAILABLE</span>
+        </div>
+      </div>
+      <div class="plan-alert" id="plan-alert" role="status" th:if="${plan != null}"></div>
+      <section class="plan-layout">
+        <article class="panel map-panel">
+          <div class="panel-heading">
+            <div>
+              <div class="eyebrow small-eyebrow">ROOM SEAT MAP</div>
+              <h3><span th:text="${plan != null ? plan.roomName : room.name}">A-204</span> <span class="count-bubble" th:text="${plan != null ? plan.rows + ' × ' + plan.columns : room.rows + ' × ' + room.columns}">6 × 8</span></h3>
+            </div>
+            <div class="seat-legend">
+              <span th:if="${plan != null}"><i class="legend-filled"></i> Assigned</span>
+              <span><i class="legend-empty"></i> Available</span>
+              <span><i class="legend-blocked"></i> Outside capacity</span>
+            </div>
+          </div>
+          <div class="front-of-room">FRONT OF ROOM <span>BOARD / INVIGILATOR DESK</span></div>
+          <div class="seat-map" th:style="|grid-template-columns: repeat(${plan != null ? plan.columns : room.columns}, minmax(42px, 1fr))|">
+            <button type="button" class="seat-cell" th:each="cell : ${cells}" th:classappend="${!cell.usable} ? ' seat-unusable' : (${cell.assignment != null} ? ' seat-occupied' : ' seat-empty')" th:attr="data-row=${cell.row},data-column=${cell.column},data-assignment-id=${cell.assignment != null ? cell.assignment.assignmentId : ''},title=${cell.assignment != null ? cell.assignment.studentName + ' · ' + cell.assignment.branch : (cell.usable ? 'Available seat' : 'Outside capacity')}" th:disabled="${!cell.usable or (plan != null and plan.status.name() == 'LOCKED') or plan == null}">
+              <span class="seat-number" th:text="${'R' + cell.row + '·' + cell.column}">R1·1</span>
+              <strong th:if="${cell.assignment != null}" th:text="${#strings.substring(cell.assignment.studentName,0,1)}">A</strong>
+              <small th:if="${cell.assignment != null}" th:text="${cell.assignment.studentId}">24E1CS001</small>
+              <span th:if="${cell.assignment == null and cell.usable}" class="empty-seat-mark">＋</span>
+              <span th:if="${!cell.usable}" class="blocked-mark">—</span>
+            </button>
+          </div>
+          <div class="map-instructions" th:if="${plan != null and plan.status.name() != 'LOCKED'}"><span class="instruction-icon">↔</span> Move a student: select an assigned seat, then select an empty seat.</div>
+          <div class="map-instructions locked-note" th:if="${plan != null and plan.status.name() == 'LOCKED'}">This seating plan is locked. No more seat changes are allowed.</div>
+          <div class="map-instructions" th:if="${plan == null}"><span class="instruction-icon">ℹ</span> Seating layout grid for this room based on configured rows, columns, and capacity.</div>
+        </article>
+        <aside class="plan-side" th:if="${plan != null}">
+          <article class="panel score-card">
+            <div class="eyebrow small-eyebrow">ARRANGEMENT QUALITY</div>
+            <div class="score-value" th:text="${plan.conflictScore}">0</div>
+            <div class="score-label">adjacency points</div>
+            <div class="score-explainer">Lower is better. Same-branch neighbours add 10 points; same-section neighbours add 2.</div>
+            <div class="score-meta"><span>Eligible students</span><strong th:text="${#lists.size(plan.assignments)}">4</strong></div>
+            <div class="score-meta"><span>Room capacity</span><strong th:text="${plan.capacity}">46</strong></div>
+            <div class="score-meta"><span>Last updated</span><strong th:text="${#strings.substring(plan.updatedAt,0,16)}">2026-10-13</strong></div>
+          </article>
+          <article class="tip-card plan-tip">
+            <div class="tip-icon">✳</div>
+            <span class="tip-overline">REVIEW WITH CARE</span>
+            <h3>Automation proposes. You decide.</h3>
+            <p>Review the room map and score, adjust open seats, then approve and lock the final arrangement.</p>
+          </article>
+        </aside>
+        <aside class="plan-side" th:if="${plan == null}">
+          <article class="panel score-card">
+            <div class="eyebrow small-eyebrow">ROOM CAPACITY</div>
+            <div class="score-value" th:text="${room.capacity}">46</div>
+            <div class="score-label">usable seats</div>
+            <div class="score-explainer">Usable seats configured for examination sessions in this venue.</div>
+            <div class="score-meta"><span>Grid size</span><strong th:text="${room.rows * room.columns} + ' total'">48 total</strong></div>
+            <div class="score-meta"><span>Grid dimensions</span><strong th:text="${room.rows + ' × ' + room.columns}">6 × 8</strong></div>
+            <div class="score-meta"><span>Building / Location</span><strong th:text="${room.building}">Academic block</strong></div>
+          </article>
+          <article class="tip-card plan-tip">
+            <div class="tip-icon">✳</div>
+            <span class="tip-overline">VENUE CONFIGURATION</span>
+            <h3>Capacity reflects available seats.</h3>
+            <p>Seat capacity cannot exceed the room grid. Examinations assigned to this room will allocate candidates up to this capacity limit.</p>
+          </article>
+        </aside>
+      </section>
+      <footer class="page-footer"><span>SEAT-O-MATIC <i>·</i> EXAM OPERATIONS</span><span>Built for calm, confident exam days.</span></footer>
+    </section>
+  </main>
+</div>
+<script th:src="@{/js/app.js}"></script>
+</body>
+</html>

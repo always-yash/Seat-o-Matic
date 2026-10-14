@@ -180,7 +180,19 @@
     document.getElementById('form-error').textContent = '';
     dialog.showModal();
   });
+
+  dialog.querySelectorAll('.dialog-close, .button-quiet').forEach((button) => {
+    button.addEventListener('click', (e) => {
+      e.preventDefault();
+      dialog.close();
+    });
+  });
   form.addEventListener('submit', async (event) => {
+    if (event.submitter && (event.submitter.value === 'cancel' || event.submitter.classList.contains('dialog-close') || event.submitter.classList.contains('button-quiet'))) {
+      event.preventDefault();
+      dialog.close();
+      return;
+    }
     event.preventDefault();
     const payload = Object.fromEntries(new FormData(form).entries());
     if (page === 'team' && new TextEncoder().encode(payload.password || '').length > 72) {

@@ -95,5 +95,22 @@ public class PageController {
         return "candidates";
     }
 
+    @GetMapping({"/workspace/rooms/{id}", "/workspace/rooms/{id}/layout"})
+    @PreAuthorize("hasAnyRole('ADMIN','FACULTY')")
+    public String roomLayout(@PathVariable Long id, Model model) {
+        var room = exams.findRoom(id);
+        model.addAttribute("room", room);
+        List<SeatCell> cells = new ArrayList<>();
+        for (int row = 1; row <= room.getRows(); row++) {
+            for (int column = 1; column <= room.getColumns(); column++) {
+                int seatIndex = (row - 1) * room.getColumns() + ((row % 2 == 1) ? column : room.getColumns() - column + 1);
+                cells.add(new SeatCell(row, column, seatIndex <= room.getCapacity(), null));
+            }
+        }
+        model.addAttribute("cells", cells);
+        model.addAttribute("page", "rooms");
+        return "seating-plan";
+    }
+
     public record SeatCell(int row, int column, boolean usable, PlanView.SeatView assignment) { }
 }

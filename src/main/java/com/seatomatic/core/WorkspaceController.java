@@ -25,18 +25,24 @@ public class WorkspaceController {
     private final UserAccountService userAccounts;
 
     public WorkspaceController(StudentService students, ExamService exams, PaperRunService papers,
-                               AuditService audit, SeatingPlanRepository plans, UserAccountService userAccounts) {
-        this.students = students; this.exams = exams; this.papers = papers; this.audit = audit; this.plans = plans;
+            AuditService audit, SeatingPlanRepository plans, UserAccountService userAccounts) {
+        this.students = students;
+        this.exams = exams;
+        this.papers = papers;
+        this.audit = audit;
+        this.plans = plans;
         this.userAccounts = userAccounts;
     }
 
     @GetMapping("/workspace/{section}")
     public String workspace(@PathVariable String section, Model model, Authentication authentication) {
-        if (!java.util.Set.of("students", "exams", "rooms", "papers", "analytics", "team").contains(section)) return "redirect:/";
+        if (!java.util.Set.of("students", "exams", "rooms", "papers", "analytics", "team").contains(section))
+            return "redirect:/";
         boolean admin = hasRole(authentication, "ROLE_ADMIN");
         boolean faculty = hasRole(authentication, "ROLE_FACULTY");
         if ((java.util.Set.of("students", "exams", "rooms", "papers").contains(section) && !admin && !faculty)
-                || (java.util.Set.of("analytics", "team").contains(section) && !admin)) throw new AccessDeniedException("This workspace is not available to your account.");
+                || (java.util.Set.of("analytics", "team").contains(section) && !admin))
+            throw new AccessDeniedException("This workspace is not available to your account.");
         model.addAttribute("page", section);
         switch (section) {
             case "students" -> model.addAttribute("records", students.findAll());
@@ -45,7 +51,8 @@ public class WorkspaceController {
                 model.addAttribute("records", records);
                 model.addAttribute("rooms", exams.findRooms());
                 Map<Long, Long> planIds = new HashMap<>();
-                records.forEach(exam -> plans.findByExamId(exam.getId()).ifPresent(plan -> planIds.put(exam.getId(), plan.getId())));
+                records.forEach(exam -> plans.findByExamId(exam.getId())
+                        .ifPresent(plan -> planIds.put(exam.getId(), plan.getId())));
                 model.addAttribute("planIds", planIds);
             }
             case "rooms" -> model.addAttribute("records", exams.findRooms());
@@ -71,9 +78,12 @@ public class WorkspaceController {
     }
 
     private boolean hasRole(Authentication authentication, String role) {
-        return authentication != null && authentication.getAuthorities().stream().anyMatch(authority -> authority.getAuthority().equals(role));
+        return authentication != null && authentication.getAuthorities().stream()
+                .anyMatch(authority -> authority.getAuthority().equals(role));
     }
 
     @GetMapping("/workspace/plans/{id}/edit")
-    public String redirectPlanEdit(@PathVariable Long id) { return "redirect:/workspace/plans/" + id; }
+    public String redirectPlanEdit(@PathVariable Long id) {
+        return "redirect:/workspace/plans/" + id;
+    }
 }
