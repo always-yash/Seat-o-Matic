@@ -44,7 +44,9 @@ public class WorkspaceController {
             return "redirect:/";
         boolean admin = hasRole(authentication, "ROLE_ADMIN");
         boolean faculty = hasRole(authentication, "ROLE_FACULTY");
-        if ((java.util.Set.of("students", "exams", "rooms", "papers").contains(section) && !admin && !faculty)
+        boolean invigilator = hasRole(authentication, "ROLE_INVIGILATOR");
+        if ((java.util.Set.of("students", "exams", "rooms").contains(section) && !admin && !faculty)
+                || ("papers".equals(section) && !admin && !faculty && !invigilator)
                 || (java.util.Set.of("analytics", "team").contains(section) && !admin))
             throw new AccessDeniedException("This workspace is not available to your account.");
         model.addAttribute("page", section);
@@ -65,7 +67,20 @@ public class WorkspaceController {
                 model.addAttribute("invigilatorMap", invigilatorMap);
             }
             case "rooms" -> model.addAttribute("records", exams.findRooms());
-            case "papers" -> model.addAttribute("records", papers.findAll());
+            case "papers" -> {
+                if (invigilator && !admin && !faculty) {
+                    var myAssignments = assignmentService.findForInvigilator(authentication.getName());
+                    var myExamRoomPairs = myAssignments.stream()
+                            .map(a -> a.examId() + ":" + a.roomId())
+                            .collect(java.util.stream.Collectors.toSet());
+                    var filtered = papers.findAll().stream()
+                            .filter(run -> myExamRoomPairs.contains(run.getExam().getId() + ":" + run.getRoom().getId()))
+                            .toList();
+                    model.addAttribute("records", filtered);
+                } else {
+                    model.addAttribute("records", papers.findAll());
+                }
+            }
             case "team" -> {
                 var accounts = userAccounts.list();
                 model.addAttribute("records", accounts);
