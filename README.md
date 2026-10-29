@@ -38,7 +38,7 @@ Seat-o-Matic is a constraint-aware examination seating and question-paper platfo
 | 2 | Ved Prakash Sharma | 24E1ARCSM40P180 | vedsharma6377@gmail.com | 7877145457 |
 | 3 | Shivesh Surolia | 24E1ARCSM40P152 | shiveshsurolia@gmail.com | 6367340522 |
 | 4 | Shivraj Singh | 24E1ARCSM40P153 | 99shivrajsrathore@gmail.com | 7877138838 |
-| 5 | Sanjay Jangid | 24E1ARCSM30P146 | jangidsanjay@gmail.com | 8118875541 |
+| 5 | Sanjay Jangid | 24E1ARCSM30P146 | jangidssanjay@gmail.com | 8118875541 |
 
 ### 1.4 Module Ownership
 
